@@ -1,18 +1,16 @@
 /* =============================================================
    ParamAI — paramai.bio
    Editorial / scientific-instrument design language.
-   Warm cream paper for prose. Deep ink for engine sections.
-   Display: Fraunces (variable serif). Body: Inter. Mono: JetBrains Mono.
    ============================================================= */
 
 :root {
-  /* Paper palette — for prose and editorial sections */
+  /* Paper palette */
   --paper:        #f5f1e8;
   --paper-2:      #ede7d8;
   --paper-line:   #d9d1bc;
   --paper-deep:   #c8bea3;
 
-  /* Ink palette — for engine / technical sections */
+  /* Ink palette */
   --ink:          #0e1116;
   --ink-2:        #161a21;
   --ink-3:        #1d222b;
@@ -26,7 +24,7 @@
   --text-on-ink:  #e7e3d8;
   --text-on-ink-soft: #8d8676;
 
-  /* Accents — rust, olive, gold (signature ParamAI palette) */
+  /* Accents */
   --rust:         #b94e2a;
   --rust-soft:    #d97757;
   --olive:        #7c8a3d;
@@ -63,7 +61,6 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Subtle paper grain texture */
 body::before {
   content: "";
   position: fixed;
@@ -76,12 +73,9 @@ body::before {
 }
 
 main { position: relative; z-index: 1; }
-
 a { color: inherit; text-decoration: none; }
-
 code, .mono { font-family: var(--mono); }
 
-/* Serif display headings */
 h1, h2, h3, .display {
   font-family: var(--serif);
   font-weight: 500;
@@ -98,8 +92,7 @@ p { margin: 0 0 1em; }
 p:last-child { margin-bottom: 0; }
 
 /* ============================================================
-   SCROLL ENGINE — borrowed from EOHF / Rishi sites
-   Opt-in via `data-anim`; fail-safe if JS doesn't load
+   SCROLL ENGINE — opt-in via data-anim
    ============================================================ */
 .anim-ready .anim {
   opacity: 0;
@@ -141,7 +134,7 @@ p:last-child { margin-bottom: 0; }
 }
 
 /* ============================================================
-   LAYOUT — container
+   LAYOUT
    ============================================================ */
 .container {
   max-width: 1180px;
@@ -155,7 +148,7 @@ p:last-child { margin-bottom: 0; }
 }
 
 /* ============================================================
-   NAVIGATION
+   NAV
    ============================================================ */
 .nav-wrap {
   position: sticky;
@@ -190,7 +183,6 @@ p:last-child { margin-bottom: 0; }
   flex-shrink: 0;
 }
 .brand-accent { color: var(--rust); font-family: var(--mono); }
-
 .nav-links {
   display: flex;
   gap: 32px;
@@ -218,7 +210,6 @@ p:last-child { margin-bottom: 0; }
   transition: transform .25s ease;
 }
 .nav-links a:hover::after { transform: scaleX(1); }
-
 .nav-cta {
   display: inline-flex;
   align-items: center;
@@ -275,11 +266,11 @@ p:last-child { margin-bottom: 0; }
 }
 
 /* ============================================================
-   HERO — physiology map
+   HERO
    ============================================================ */
 .hero {
   position: relative;
-  padding: 64px 0 96px;
+  padding: 56px 0 96px;
   background: var(--paper);
   border-bottom: 1px solid var(--paper-line);
   overflow: hidden;
@@ -288,15 +279,15 @@ p:last-child { margin-bottom: 0; }
 .hero-rule {
   position: absolute;
   left: 40px; right: 40px;
-  top: 32px;
+  top: 28px;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--paper-deep), transparent);
 }
 
 .hero-grid {
   display: grid;
-  grid-template-columns: 1.05fr 1fr;
-  gap: 64px;
+  grid-template-columns: 1fr 1.05fr;
+  gap: 56px;
   align-items: center;
 }
 
@@ -325,15 +316,15 @@ p:last-child { margin-bottom: 0; }
 }
 
 .hero h1 {
-  font-size: clamp(40px, 6vw, 76px);
-  line-height: 1.02;
+  font-size: clamp(38px, 5.4vw, 64px);
+  line-height: 1.04;
   margin: 0 0 28px;
   font-weight: 400;
   letter-spacing: -0.025em;
 }
 
 .hero-lede {
-  font-size: 19px;
+  font-size: 18px;
   color: var(--text-soft);
   max-width: 540px;
   margin: 0 0 36px;
@@ -347,105 +338,92 @@ p:last-child { margin-bottom: 0; }
 }
 
 /* ============================================================
-   PHYSIOLOGY MAP
+   HERO — generative flow-field canvas
+   Continuous procedural motion. Responds to scroll + mouse.
    ============================================================ */
-.physiology-stage {
+.hero-stage {
   position: relative;
-  aspect-ratio: 1 / 1.05;
-  max-height: 600px;
 }
 
-.physiology-stage svg {
+.flow-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1.05;
+  max-height: 640px;
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow:
+    var(--shadow-md),
+    inset 0 0 80px rgba(245, 241, 232, 0.6);
+  isolation: isolate;
+}
+
+#flow-canvas {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   display: block;
+  cursor: crosshair;
 }
 
-/* Body outline base styles */
-.body-outline {
-  fill: rgba(216, 209, 188, 0.18);
-  stroke: var(--paper-deep);
-  stroke-width: 1.2;
+/* Soft vignette so the field reads as having edges */
+.flow-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse at center,
+      transparent 30%,
+      rgba(245, 241, 232, 0.6) 100%
+    );
+  z-index: 2;
 }
 
-/* Compartments — circles that "light up" */
-.compartment {
-  fill: var(--paper-2);
-  stroke: var(--text-soft);
-  stroke-width: 1.5;
-  cursor: pointer;
-  transition: fill .35s ease, stroke .35s ease, transform .35s ease;
-  transform-origin: center;
-  transform-box: fill-box;
+.flow-overlay {
+  position: absolute;
+  bottom: 18px;
+  left: 20px;
+  z-index: 3;
+  pointer-events: none;
 }
-.compartment:hover {
-  fill: var(--rust-soft);
-}
-.compartment.lit {
-  fill: var(--rust);
-  stroke: var(--rust);
-}
-.compartment.lit.olive {
-  fill: var(--olive);
-  stroke: var(--olive);
-}
-
-.compartment-label {
+.flow-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-family: var(--mono);
   font-size: 10.5px;
-  fill: var(--text);
-  font-weight: 500;
-  pointer-events: none;
-  text-anchor: middle;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-
-.flow-line {
-  fill: none;
-  stroke: var(--paper-deep);
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  opacity: 0.55;
-}
-.flow-line.active {
-  stroke: var(--rust);
-  opacity: 0.9;
-}
-
-.parameter-callout {
-  position: absolute;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--text-soft);
-  background: rgba(245, 241, 232, 0.95);
-  border: 1px solid var(--paper-deep);
-  padding: 4px 8px;
-  border-radius: 4px;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity .4s ease;
-  white-space: nowrap;
-}
-.parameter-callout.shown { opacity: 1; }
-.parameter-callout .pc-key { color: var(--rust); font-weight: 600; }
-.parameter-callout .pc-val { color: var(--text); font-weight: 500; }
-
-.map-caption {
-  position: absolute;
-  left: 0; right: 0;
-  bottom: -36px;
-  text-align: center;
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: 14px;
   color: var(--text-muted);
-  height: 22px;
-  transition: opacity .4s ease;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  background: rgba(245, 241, 232, 0.85);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid var(--paper-line);
+  border-radius: 999px;
+}
+.flow-tag::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--rust);
+  box-shadow: 0 0 0 0 rgba(185, 78, 42, 0.5);
+  animation: tag-pulse 2s infinite;
+}
+@keyframes tag-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(185, 78, 42, 0.4); }
+  70%  { box-shadow: 0 0 0 8px rgba(185, 78, 42, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(185, 78, 42, 0); }
 }
 
 /* ============================================================
-   SECTIONS — shared
+   SECTIONS
    ============================================================ */
 .section {
   padding: 120px 0;
@@ -473,15 +451,15 @@ p:last-child { margin-bottom: 0; }
 }
 
 .section-head {
-  margin-bottom: 64px;
+  margin-bottom: 56px;
 }
 .section-head .eyebrow {
   color: var(--rust);
   margin-bottom: 16px;
 }
 .section h2 {
-  font-size: clamp(34px, 4.8vw, 56px);
-  line-height: 1.05;
+  font-size: clamp(32px, 4.4vw, 50px);
+  line-height: 1.08;
   letter-spacing: -0.02em;
   margin: 0;
   max-width: 880px;
@@ -489,7 +467,7 @@ p:last-child { margin-bottom: 0; }
 .section-ink h2 { color: var(--text-on-ink); }
 .section-ink h2 em { color: var(--rust-soft); }
 .section-sub {
-  font-size: 19px;
+  font-size: 18px;
   color: var(--text-soft);
   margin-top: 18px;
   max-width: 720px;
@@ -498,7 +476,7 @@ p:last-child { margin-bottom: 0; }
 .section-ink .section-sub { color: var(--text-on-ink-soft); }
 
 /* ============================================================
-   PROBLEM SECTION — 3 cards
+   PROBLEM
    ============================================================ */
 .problem-grid {
   display: grid;
@@ -542,232 +520,91 @@ p:last-child { margin-bottom: 0; }
 }
 
 /* ============================================================
-   ARCHITECTURE SECTION — supervisor + workers diagram
+   APPROACH / CAPABILITIES
    ============================================================ */
-.arch-stage {
+.capability-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.capability {
+  padding: 36px;
   background: var(--ink-2);
   border: 1px solid var(--ink-line);
-  border-radius: 16px;
-  padding: 48px;
-  margin-top: 48px;
+  border-radius: 12px;
+  transition: transform .3s ease, border-color .3s ease;
 }
-
-.supervisor-block {
-  text-align: center;
-  margin: 0 auto 32px;
-  padding: 36px 28px;
-  max-width: 600px;
-  background: var(--ink-3);
-  border: 1px solid var(--rust);
-  border-radius: 14px;
-  position: relative;
+.capability:hover {
+  transform: translateY(-3px);
+  border-color: var(--rust-soft);
 }
-.supervisor-block .block-title {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--rust-soft);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin-bottom: 12px;
-}
-.supervisor-block h3 {
+.cap-num {
   font-family: var(--serif);
-  font-size: 28px;
+  font-style: italic;
+  font-size: 26px;
+  color: var(--rust-soft);
+  margin-bottom: 14px;
+  font-weight: 400;
+}
+.capability h3 {
+  font-family: var(--serif);
+  font-size: 22px;
   font-weight: 500;
   color: var(--text-on-ink);
-  margin: 0 0 8px;
+  margin: 0 0 12px;
+  letter-spacing: -0.01em;
 }
-.supervisor-block p {
+.capability p {
   color: var(--text-on-ink-soft);
-  font-size: 14px;
+  font-size: 15px;
+  line-height: 1.55;
   margin: 0;
 }
 
-.arch-connector {
-  display: block;
-  margin: 0 auto;
-  width: 1px;
-  height: 36px;
-  background: linear-gradient(180deg, var(--rust), transparent);
-  position: relative;
-}
-.arch-connector::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%) rotate(45deg);
-  width: 8px;
-  height: 8px;
-  border-right: 1px solid var(--rust);
-  border-bottom: 1px solid var(--rust);
-}
-
-.workers-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 12px;
-  margin-top: 24px;
-}
-.worker-card {
-  padding: 20px 16px;
-  background: var(--ink-3);
-  border: 1px solid var(--ink-line);
-  border-radius: 8px;
-  text-align: center;
-  transition: border-color .25s ease, transform .25s ease;
-}
-.worker-card:hover {
-  border-color: var(--rust-soft);
-  transform: translateY(-2px);
-}
-.worker-icon {
-  font-size: 20px;
-  margin-bottom: 10px;
-  display: block;
-}
-.worker-name {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--text-on-ink);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-.worker-desc {
-  font-size: 11.5px;
-  color: var(--text-on-ink-soft);
-  line-height: 1.4;
-}
-
 /* ============================================================
-   MOAT TABLE
+   WHY NOW
    ============================================================ */
-.moat-table {
-  margin-top: 48px;
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.why-card {
+  padding: 36px;
   background: var(--paper-2);
   border: 1px solid var(--paper-line);
   border-radius: 12px;
-  overflow: hidden;
+  border-left: 3px solid var(--rust);
+  transition: transform .3s ease, box-shadow .3s ease;
 }
-.moat-row {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  padding: 22px 28px;
-  border-bottom: 1px solid var(--paper-line);
-  align-items: center;
-  gap: 20px;
+.why-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
 }
-.moat-row:last-child { border-bottom: none; }
-.moat-row.header {
-  background: var(--paper);
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-.moat-row.headline {
-  background: rgba(185, 78, 42, 0.04);
-}
-.moat-row.headline .moat-layer {
-  color: var(--rust);
-  font-weight: 600;
-}
-.moat-layer {
-  font-size: 15px;
-  font-weight: 500;
-}
-.moat-status {
+.why-date {
   font-family: var(--mono);
   font-size: 12px;
-  color: var(--text-muted);
-}
-.moat-tag {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-family: var(--mono);
-  font-size: 10.5px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  color: var(--rust);
+  margin-bottom: 14px;
+  letter-spacing: 0.08em;
   font-weight: 600;
 }
-.moat-tag.moat { background: rgba(185, 78, 42, 0.12); color: var(--rust); }
-.moat-tag.substrate { background: rgba(124, 138, 61, 0.12); color: var(--olive); }
-.moat-tag.commodity { background: rgba(106, 99, 86, 0.12); color: var(--text-muted); }
-
-/* ============================================================
-   TIMELINE — regulatory tailwinds
-   ============================================================ */
-.timeline {
-  position: relative;
-  margin-top: 64px;
-  padding-bottom: 40px;
-}
-.timeline-track {
-  position: absolute;
-  left: 24px; right: 24px;
-  top: 48px;
-  height: 2px;
-  background: var(--ink-line);
-}
-.timeline-fill {
-  height: 100%;
-  width: 0;
-  background: linear-gradient(90deg, var(--rust), var(--gold), var(--olive));
-  transition: width 2.5s cubic-bezier(.22, .61, .36, 1);
-}
-.timeline.in .timeline-fill { width: 100%; }
-
-.timeline-items {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
-  padding-top: 24px;
-}
-.timeline-item {
-  text-align: left;
-  padding-top: 56px;
-  position: relative;
-}
-.timeline-item::before {
-  content: "";
-  position: absolute;
-  top: 17px;
-  left: 0;
-  width: 14px;
-  height: 14px;
-  background: var(--ink);
-  border: 2px solid var(--rust);
-  border-radius: 50%;
-}
-.timeline-date {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--rust-soft);
-  letter-spacing: 0.08em;
-  margin-bottom: 8px;
-  text-transform: uppercase;
-}
-.timeline-item h4 {
+.why-card h4 {
   font-family: var(--serif);
-  font-size: 19px;
+  font-size: 22px;
   font-weight: 500;
-  color: var(--text-on-ink);
-  margin: 0 0 8px;
+  margin: 0 0 12px;
   letter-spacing: -0.01em;
 }
-.timeline-item p {
-  font-size: 13.5px;
-  color: var(--text-on-ink-soft);
-  line-height: 1.5;
+.why-card p {
+  color: var(--text-soft);
+  font-size: 15px;
+  margin: 0;
+  line-height: 1.55;
 }
 
 /* ============================================================
-   CONTACT / CLOSER
+   CLOSER
    ============================================================ */
 .closer {
   text-align: center;
@@ -793,7 +630,7 @@ p:last-child { margin-bottom: 0; }
    FOOTER
    ============================================================ */
 .footer {
-  padding: 36px 0;
+  padding: 36px 0 24px;
   background: var(--paper);
   border-top: 1px solid var(--paper-line);
   font-size: 13px;
@@ -813,6 +650,17 @@ p:last-child { margin-bottom: 0; }
 .footer-right { text-align: right; }
 .footer a:hover { color: var(--rust); }
 
+.footer-attrib {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--paper-line);
+  font-size: 11.5px;
+  color: var(--text-muted);
+  text-align: center;
+}
+.footer-attrib a { color: var(--text-muted); text-decoration: underline; }
+.footer-attrib a:hover { color: var(--rust); }
+
 /* ============================================================
    RESPONSIVE
    ============================================================ */
@@ -820,12 +668,10 @@ p:last-child { margin-bottom: 0; }
   .hero-grid { grid-template-columns: 1fr; gap: 48px; }
   .nav-links { display: none; }
   .problem-grid { grid-template-columns: 1fr; }
-  .workers-grid { grid-template-columns: repeat(2, 1fr); }
-  .timeline-items { grid-template-columns: 1fr 1fr; }
-  .timeline-track { display: none; }
-  .moat-row { grid-template-columns: 1fr; gap: 8px; }
-  .moat-row.header { display: none; }
+  .capability-grid { grid-template-columns: 1fr; }
+  .why-grid { grid-template-columns: 1fr; }
   .footer-inner { grid-template-columns: 1fr; text-align: center; }
   .footer-right { text-align: center; }
   .section { padding: 80px 0; }
+  .stage-frame { aspect-ratio: 1 / 1.1; }
 }
