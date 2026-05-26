@@ -1,0 +1,38 @@
+# Sensitive files
+*recovery*
+*.key
+*.pem
+.env
+.env.*
+.envrc
+*.token
+secrets/
+.secrets/
+private/
+
+# OS / editor
+.DS_Store
+.Spotlight-V100
+.Trashes
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.claude/
+
+# Build / deps
+node_modules/
+.cache/
+dist/
+build/
+.parcel-cache/
+.next/
+
+# Logs
+*.log
+logs/
+
+# macOS
+._*

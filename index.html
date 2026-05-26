@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ParamAI · An AI scientist for pharmacology</title>
+<meta name="description" content="ParamAI is an orchestrated agent system for mechanistic pharmacology modeling. We extract kinetic parameters from literature, validate them against the laws of human physiology, and produce simulation-ready models with FDA-grade provenance." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+<script>document.documentElement.classList.add('anim-ready');</script>
+</head>
+<body>
+
+<div class="read-progress"></div>
+
+<header class="nav-wrap">
+  <nav class="nav container">
+    <a href="#top" class="brand">
+      <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+        <circle cx="20" cy="20" r="17" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M8 24 Q14 8, 20 20 T32 16" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <circle cx="20" cy="20" r="2.5" fill="currentColor"/>
+      </svg>
+      <span>Param<span class="brand-accent">·</span>AI</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#problem">The problem</a></li>
+      <li><a href="#architecture">How it works</a></li>
+      <li><a href="#moat">Defensibility</a></li>
+      <li><a href="#why-now">Why now</a></li>
+    </ul>
+    <a href="#contact" class="nav-cta">Talk to us →</a>
+  </nav>
+</header>
+
+<main id="top">
+
+  <!-- ============================================================
+       HERO
+       ============================================================ -->
+  <section class="hero">
+    <div class="hero-rule"></div>
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-text anim" data-anim="fade-up">
+          <div class="eyebrow">
+            <span class="eb-dot"></span>
+            An AI scientist for pharmacology
+          </div>
+          <h1>Pharma has the simulators.<br/><em>They're starving for verified data.</em></h1>
+          <p class="hero-lede">
+            ParamAI is an orchestrated agent system that reads the world's
+            pharmacological literature, validates each kinetic parameter
+            against the laws of human physiology, and produces
+            simulation-ready models with FDA-grade provenance.
+          </p>
+          <div class="hero-ctas">
+            <a href="#architecture" class="btn btn-primary">
+              See how it works
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+            <a href="#contact" class="btn btn-ghost">Book a pilot</a>
+          </div>
+        </div>
+
+        <!-- ===== Physiology Map ===== -->
+        <div class="physiology-stage anim" data-anim="fade-in" data-delay="200">
+          <svg id="physiology-map" viewBox="0 0 400 420" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- Faint body silhouette -->
+            <g class="body-outline-group">
+              <!-- Head -->
+              <ellipse class="body-outline" cx="200" cy="48" rx="34" ry="40"/>
+              <!-- Neck -->
+              <rect class="body-outline" x="186" y="84" width="28" height="20" rx="4"/>
+              <!-- Torso -->
+              <path class="body-outline" d="M 130 110 Q 130 100 142 100 L 258 100 Q 270 100 270 110 L 282 240 Q 282 252 270 252 L 130 252 Q 118 252 118 240 Z"/>
+              <!-- Arms -->
+              <path class="body-outline" d="M 130 110 L 88 230 Q 84 240 92 246 L 100 248"/>
+              <path class="body-outline" d="M 270 110 L 312 230 Q 316 240 308 246 L 300 248"/>
+              <!-- Hips/legs -->
+              <path class="body-outline" d="M 138 252 L 142 380 Q 144 392 156 392 L 180 392 Q 192 392 192 380 L 196 252"/>
+              <path class="body-outline" d="M 204 252 L 208 380 Q 208 392 220 392 L 244 392 Q 256 392 258 380 L 262 252"/>
+            </g>
+
+            <!-- Blood flow lines (faint network) -->
+            <g class="flows">
+              <!-- Heart to lungs -->
+              <path class="flow-line" id="flow-heart-lung" d="M 200 158 Q 200 148 200 142"/>
+              <!-- Heart to liver -->
+              <path class="flow-line" id="flow-heart-liver" d="M 200 168 Q 200 188 178 200"/>
+              <!-- Heart to kidneys -->
+              <path class="flow-line" id="flow-heart-kidney-l" d="M 200 168 Q 188 195 168 218"/>
+              <path class="flow-line" id="flow-heart-kidney-r" d="M 200 168 Q 212 195 232 218"/>
+              <!-- Heart to brain -->
+              <path class="flow-line" id="flow-heart-brain" d="M 200 150 Q 200 105 200 75"/>
+              <!-- Gut to liver (portal vein) -->
+              <path class="flow-line" id="flow-gut-liver" d="M 200 225 Q 188 215 178 208"/>
+              <!-- Liver to systemic -->
+              <path class="flow-line" id="flow-liver-systemic" d="M 178 200 Q 158 192 142 180"/>
+              <!-- Systemic to rest of body -->
+              <path class="flow-line" d="M 200 248 Q 200 280 200 320"/>
+            </g>
+
+            <!-- COMPARTMENTS -->
+            <!-- Brain -->
+            <g id="comp-brain" data-name="Brain" data-param="Q_brain ≈ 50 L/h">
+              <circle class="compartment" cx="200" cy="48" r="22"/>
+              <text class="compartment-label" x="200" y="52">Brain</text>
+            </g>
+
+            <!-- Lung -->
+            <g id="comp-lung" data-name="Lung" data-param="Q_lung = cardiac output">
+              <circle class="compartment" cx="200" cy="132" r="14"/>
+              <text class="compartment-label" x="200" y="135">Lung</text>
+            </g>
+
+            <!-- Heart (central) — the systemic distribution point -->
+            <g id="comp-heart" data-name="Systemic" data-param="Cardiac output ≈ 312 L/h">
+              <circle class="compartment" cx="200" cy="160" r="9"/>
+            </g>
+
+            <!-- Liver -->
+            <g id="comp-liver" data-name="Liver" data-param="Q_H = 90 L/h · CL_int derived">
+              <ellipse class="compartment" cx="170" cy="200" rx="26" ry="14"/>
+              <text class="compartment-label" x="170" y="203">Liver</text>
+            </g>
+
+            <!-- Gut -->
+            <g id="comp-gut" data-name="Gut" data-param="Q_gut = 18 L/h · F_oral">
+              <ellipse class="compartment" cx="200" cy="230" rx="22" ry="11"/>
+              <text class="compartment-label" x="200" y="233">Gut</text>
+            </g>
+
+            <!-- Kidneys (pair) -->
+            <g id="comp-kidney-l" data-name="Kidney" data-param="Q_R = 74 L/h · CL_R">
+              <ellipse class="compartment" cx="168" cy="220" rx="9" ry="13"/>
+            </g>
+            <g id="comp-kidney-r" data-name="Kidney" data-param="Q_R = 74 L/h · CL_R">
+              <ellipse class="compartment" cx="232" cy="220" rx="9" ry="13"/>
+            </g>
+
+            <!-- Adipose / rest of body -->
+            <g id="comp-rest" data-name="Tissue" data-param="K_p,tissue · V_d">
+              <ellipse class="compartment" cx="200" cy="320" rx="42" ry="22"/>
+              <text class="compartment-label" x="200" y="323">Tissue</text>
+            </g>
+          </svg>
+
+          <!-- Floating parameter callouts that fade in on a timer -->
+          <div class="parameter-callout" id="callout-1" style="top: 12%; left: 4%;">
+            <span class="pc-key">Q_H</span> = <span class="pc-val">90 L/h</span>
+          </div>
+          <div class="parameter-callout" id="callout-2" style="top: 40%; right: 4%;">
+            <span class="pc-key">CL<sub>int</sub></span> = <span class="pc-val">derived</span>
+          </div>
+          <div class="parameter-callout" id="callout-3" style="bottom: 28%; left: 6%;">
+            <span class="pc-key">f_u</span> = <span class="pc-val">0.09</span>
+          </div>
+          <div class="parameter-callout" id="callout-4" style="top: 65%; right: 2%;">
+            <span class="pc-key">V_d</span> = <span class="pc-val">1400 L</span>
+          </div>
+
+          <div class="map-caption" id="map-caption"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       PROBLEM
+       ============================================================ -->
+  <section id="problem" class="section">
+    <div class="container">
+      <div class="section-head anim" data-anim="fade-up">
+        <div class="eyebrow">The bottleneck</div>
+        <h2>Quantitative Systems Pharmacology engines can predict efficacy and toxicity before a single patient is dosed — <em>if</em> they are fed correct parameters.</h2>
+        <p class="section-sub">
+          Each simulation needs hundreds of kinetic constants: receptor binding rates, hepatic extraction ratios, partition coefficients, intrinsic clearances. That data is trapped in millions of unstructured papers.
+        </p>
+      </div>
+
+      <div class="problem-grid" data-stagger="120">
+        <div class="problem-card anim" data-anim="fade-up">
+          <div class="problem-num">01 / Manual</div>
+          <h3>PhDs extract by hand</h3>
+          <p>Highly paid pharmacometricians spend months per program. Most teams skip it entirely and revert to empirical dosing — which is exactly why <em>97% of oncology trials fail</em>.</p>
+        </div>
+        <div class="problem-card anim" data-anim="fade-up">
+          <div class="problem-num">02 / Naive AI</div>
+          <h3>Generic NLP scrapes garbage</h3>
+          <p>Published parameters frequently violate the laws of physiology. Feed contradictory inputs to a QSP model and the simulation <em>silently collapses</em>.</p>
+        </div>
+        <div class="problem-card anim" data-anim="fade-up">
+          <div class="problem-num">03 / Stakes</div>
+          <h3>Dose-finding is guessing</h3>
+          <p>FDA's <em>Project Optimus</em> now mandates mathematical dose optimization in oncology. Empirical maximum-tolerated-dose is no longer defensible.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       ARCHITECTURE — supervisor + workers
+       ============================================================ -->
+  <section id="architecture" class="section section-ink">
+    <div class="container">
+      <div class="section-head anim" data-anim="fade-up">
+        <div class="eyebrow">The architecture</div>
+        <h2>Not an LLM with extra steps. <em>An orchestrated agent system.</em></h2>
+        <p class="section-sub">
+          A stateful supervisor with embedded pharmacology expertise dispatches specialized worker agents,
+          integrates their outputs into a unified internal understanding, and projects that understanding
+          into regulator-defensible models via an interpretability layer.
+        </p>
+      </div>
+
+      <div class="arch-stage anim" data-anim="fade-up">
+        <div class="supervisor-block">
+          <div class="block-title">Supervisor agent</div>
+          <h3>Hybrid state + control policy</h3>
+          <p>Structured beliefs with citations + learned latent representation. Decides which workers to dispatch, integrates results, transitions state.</p>
+        </div>
+
+        <div class="arch-connector"></div>
+
+        <div class="workers-grid" data-stagger="80">
+          <div class="worker-card anim" data-anim="fade-up">
+            <span class="worker-icon">📖</span>
+            <div class="worker-name">Literature</div>
+            <div class="worker-desc">Fetches papers, extracts structured parameters with provenance</div>
+          </div>
+          <div class="worker-card anim" data-anim="fade-up">
+            <span class="worker-icon">⚙</span>
+            <div class="worker-name">Simulation</div>
+            <div class="worker-desc">Integrates the current ODE system forward in time</div>
+          </div>
+          <div class="worker-card anim" data-anim="fade-up">
+            <span class="worker-icon">∮</span>
+            <div class="worker-name">ODE Crafter</div>
+            <div class="worker-desc">Proposes the right equation structure for this drug</div>
+          </div>
+          <div class="worker-card anim" data-anim="fade-up">
+            <span class="worker-icon">⌬</span>
+            <div class="worker-name">Hypothesis</div>
+            <div class="worker-desc">Generates alternative models to test against data</div>
+          </div>
+          <div class="worker-card anim" data-anim="fade-up">
+            <span class="worker-icon">✓</span>
+            <div class="worker-name">Verifier</div>
+            <div class="worker-desc">Mass balance, units, identifiability — non-negotiable</div>
+          </div>
+          <div class="worker-card anim" data-anim="fade-up">
+            <span class="worker-icon">⚗</span>
+            <div class="worker-name">Experiment</div>
+            <div class="worker-desc">Proposes the wet-lab study that closes the biggest gap</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       MOAT
+       ============================================================ -->
+  <section id="moat" class="section">
+    <div class="container">
+      <div class="section-head anim" data-anim="fade-up">
+        <div class="eyebrow">The defensibility</div>
+        <h2>The moat is the supervisor's embedded pharmacology — not the LLM.</h2>
+        <p class="section-sub">
+          Extraction is commoditizing. Academic systems already hit ≥99% precision on narrow domains.
+          The moat lives downstream: in physics-validated parameters with a regulator-acceptable
+          provenance trail that no extractor alone can produce.
+        </p>
+      </div>
+
+      <div class="moat-table anim" data-anim="fade-up">
+        <div class="moat-row header">
+          <div>Layer</div>
+          <div>Defensibility</div>
+          <div>Status</div>
+        </div>
+        <div class="moat-row">
+          <div class="moat-layer">LLM-based literature extraction</div>
+          <div class="moat-status">Commoditizing</div>
+          <div><span class="moat-tag commodity">Substrate</span></div>
+        </div>
+        <div class="moat-row">
+          <div class="moat-layer">Unit-aware parameter normalization</div>
+          <div class="moat-status">Solved-in-principle</div>
+          <div><span class="moat-tag substrate">Year 1</span></div>
+        </div>
+        <div class="moat-row headline">
+          <div class="moat-layer">Pharmacology-aware supervisor agent</div>
+          <div class="moat-status">Sourced only from senior pharmacometric expertise</div>
+          <div><span class="moat-tag moat">Moat</span></div>
+        </div>
+        <div class="moat-row headline">
+          <div class="moat-layer">Worker-agent orchestration with embedded heuristics</div>
+          <div class="moat-status">Recorded gold-standard sessions; not buyable</div>
+          <div><span class="moat-tag moat">Moat</span></div>
+        </div>
+        <div class="moat-row headline">
+          <div class="moat-layer">Interpretability layer (probes + SAEs + causal interventions)</div>
+          <div class="moat-status">Regulatory bridge no other vendor has shipped</div>
+          <div><span class="moat-tag moat">Moat</span></div>
+        </div>
+        <div class="moat-row">
+          <div class="moat-layer">Simulation engine</div>
+          <div class="moat-status">Integrate — don't build</div>
+          <div><span class="moat-tag substrate">Year 1</span></div>
+        </div>
+        <div class="moat-row">
+          <div class="moat-layer">FDA acceptance pathway</div>
+          <div class="moat-status">Long political work; named in approval letter</div>
+          <div><span class="moat-tag substrate">Years 2–4</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       WHY NOW — regulatory timeline
+       ============================================================ -->
+  <section id="why-now" class="section section-ink">
+    <div class="container">
+      <div class="section-head anim" data-anim="fade-up">
+        <div class="eyebrow">Why now</div>
+        <h2>Regulation is forcing the buyer.</h2>
+        <p class="section-sub">
+          Four documents in a 36-month window define the category. Build to ICH M15 from day one;
+          everything else follows from it.
+        </p>
+      </div>
+
+      <div class="timeline anim" data-anim="fade-up" data-once="false" id="timeline">
+        <div class="timeline-track">
+          <div class="timeline-fill"></div>
+        </div>
+        <div class="timeline-items">
+          <div class="timeline-item">
+            <div class="timeline-date">Dec 2022</div>
+            <h4>FDA Modernization Act 2.0</h4>
+            <p>Removes the legal mandate for animal testing. Explicitly permits computational models.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">Aug 2024</div>
+            <h4>Project Optimus</h4>
+            <p>Final guidance. Mandates randomized dose-ranging and mathematical optimization in oncology.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">Sept 2025</div>
+            <h4>Computer Software Assurance</h4>
+            <p>FDA finalizes risk-based assurance framework. Favorable to modern SaaS engineering.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">Jul 2026</div>
+            <h4>ICH M15 effective</h4>
+            <p>Harmonizes US / EU / Japan / China on MIDD evidence. One common framework.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       CLOSER
+       ============================================================ -->
+  <section id="contact" class="closer">
+    <div class="container-narrow anim" data-anim="fade-up">
+      <h2>From reactive guessing to <em>predictive science.</em></h2>
+      <p>
+        ParamAI is the data layer underneath the next decade of drug development.
+        We're talking with mid-cap pharma clinical pharmacology groups about first pilots in 2026.
+      </p>
+      <a href="mailto:founders@paramai.bio" class="btn btn-primary">
+        founders@paramai.bio
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </section>
+
+
+</main>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <div>© <span data-year></span> ParamAI</div>
+    <div class="footer-mid">An AI scientist for pharmacology</div>
+    <div class="footer-right">
+      <a href="mailto:founders@paramai.bio">founders@paramai.bio</a>
+    </div>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
