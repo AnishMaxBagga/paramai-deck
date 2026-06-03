@@ -152,7 +152,7 @@
   margin-bottom: 36px;
 }
 .act-narrative p {
-  font-family: "Fraunces", serif;
+  font-family: "Source Serif 4", "Source Serif Pro", Georgia, serif;
   font-size: 20px;
   font-weight: 400;
   color: var(--ink);
@@ -206,7 +206,7 @@
 .card-head.warn   { background: linear-gradient(90deg, rgba(199, 154, 58, 0.1), transparent); }
 .card-head.subtle { background: var(--deep-3); }
 .card-title {
-  font-family: "Fraunces", serif;
+  font-family: "Source Serif 4", "Source Serif Pro", Georgia, serif;
   font-size: 17px;
   font-weight: 500;
   color: var(--deep-text);
@@ -228,7 +228,7 @@
 .paper-card .card-sub { color: var(--ink-muted); }
 .paper-body {
   padding: 28px 32px;
-  font-family: "Fraunces", serif;
+  font-family: "Source Serif 4", "Source Serif Pro", Georgia, serif;
   font-size: 15px;
   line-height: 1.7;
   color: var(--ink-2);
@@ -292,7 +292,7 @@
 .frac .num, .frac .den { padding: 2px 6px; font-size: 13px; }
 .frac .num { border-bottom: 1px solid var(--deep-line-2); }
 .model-note {
-  font-family: "Fraunces", serif;
+  font-family: "Source Serif 4", "Source Serif Pro", Georgia, serif;
   font-size: 16px;
   color: var(--deep-text);
   line-height: 1.5;
@@ -518,7 +518,7 @@
 .vio-bar { background: var(--crimson); }
 .vio-body { padding: 16px 18px 16px 0; }
 .vio-head {
-  font-family: "Fraunces", serif;
+  font-family: "Source Serif 4", "Source Serif Pro", Georgia, serif;
   font-size: 16px;
   font-weight: 500;
   color: var(--crimson-soft);
@@ -832,7 +832,7 @@
 .ck-swatch.naive::after { background: var(--crimson); }
 .ck-swatch.good::after { background: var(--olive); height: 3px; }
 .ck-name {
-  font-family: "Fraunces", serif;
+  font-family: "Source Serif 4", "Source Serif Pro", Georgia, serif;
   font-size: 14px;
   font-weight: 600;
   color: var(--ink);
@@ -895,7 +895,7 @@
 }
 .chart-caption p {
   margin: 0;
-  font-family: "Fraunces", serif;
+  font-family: "Source Serif 4", "Source Serif Pro", Georgia, serif;
   font-size: 15px;
   line-height: 1.55;
   color: var(--ink);
@@ -986,7 +986,7 @@
 .dose-side.bad .dose-tag { color: var(--crimson); }
 .dose-side.good .dose-tag { color: var(--olive); }
 .dose-num {
-  font-family: "Fraunces", serif;
+  font-family: "Source Serif 4", "Source Serif Pro", Georgia, serif;
   font-size: 30px;
   font-weight: 500;
   line-height: 1;
@@ -1019,7 +1019,7 @@
 .dose-ok { color: var(--olive); }
 .dose-vs {
   display: flex; align-items: center; justify-content: center;
-  font-family: "Fraunces", serif;
+  font-family: "Source Serif 4", "Source Serif Pro", Georgia, serif;
   font-style: italic;
   font-size: 16px;
   color: var(--ink-muted);
@@ -1124,7 +1124,7 @@
 }
 .moat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
 .moat-num {
-  font-family: "Fraunces", serif;
+  font-family: "Source Serif 4", "Source Serif Pro", Georgia, serif;
   font-style: italic;
   font-size: 32px;
   color: var(--rust);
@@ -1132,7 +1132,7 @@
   font-weight: 400;
 }
 .moat-card h3 {
-  font-family: "Fraunces", serif;
+  font-family: "Source Serif 4", "Source Serif Pro", Georgia, serif;
   font-size: 22px;
   font-weight: 500;
   margin: 0 0 10px;
@@ -1173,7 +1173,7 @@
   text-transform: uppercase;
 }
 .why-item h3 {
-  font-family: "Fraunces", serif;
+  font-family: "Source Serif 4", "Source Serif Pro", Georgia, serif;
   font-size: 22px;
   font-weight: 500;
   margin: 0 0 12px;
@@ -1208,7 +1208,7 @@
   font-size: 13px;
   color: var(--ink-muted);
 }
-.footer > div:nth-child(2) { text-align: center; font-family: "Fraunces", serif; font-style: italic; }
+.footer > div:nth-child(2) { text-align: center; font-family: "Source Serif 4", "Source Serif Pro", Georgia, serif; font-style: italic; }
 .footer > div:last-child { text-align: right; }
 .footer a:hover { color: var(--rust); }
 

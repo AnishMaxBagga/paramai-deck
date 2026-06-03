@@ -32,7 +32,8 @@ const acts = document.querySelectorAll(".act");
 const epSteps = document.querySelectorAll(".ep-step");
 const epFill = document.getElementById("ep-fill");
 
-function setActiveAct(n) {
+function setActiveAct(n, opts) {
+  opts = opts || {};
   acts.forEach(a => {
     const id = parseInt(a.id.replace("act-", ""));
     a.classList.toggle("active", id <= n);
@@ -43,10 +44,12 @@ function setActiveAct(n) {
     s.classList.toggle("active", id === n);
     s.classList.toggle("done", id < n);
   });
-  // smooth scroll to act
-  const target = document.getElementById(`act-${n}`);
-  if (target) {
-    target.scrollIntoView({ behavior: "smooth", block: "start" });
+  // smooth scroll to act (only when explicitly requested — never on page load)
+  if (opts.scroll) {
+    const target = document.getElementById(`act-${n}`);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
   // progress fill
   epFill.style.width = `${((n - 1) / 4) * 100}%`;
@@ -144,24 +147,18 @@ async function runExtraction() {
   showFlowArrow("flow-2-3");
 }
 
-/* ---------- ACT 3 animation ---------- */
+/* ---------- ACT 4 animation: verifying — all rows pass with derived values ---------- */
 async function runBalanceCheck() {
   const rows = ["qh", "clh", "eh", "impl"];
   for (let i = 0; i < rows.length; i++) {
     const row = document.querySelector(`.brow[data-row="${rows[i]}"]`);
+    if (!row) continue;
     row.classList.add("checking");
-    await sleep(450);
+    await sleep(380);
     row.classList.remove("checking");
-    if (rows[i] === "impl") {
-      row.classList.add("bad");
-    } else {
-      row.classList.add("ok");
-    }
-    await sleep(160);
+    row.classList.add("ok");
+    await sleep(140);
   }
-  await sleep(400);
-  document.getElementById("violation").classList.add("show");
-  showFlowArrow("flow-3-4");
 }
 
 /* ---------- ACT 4 animation ---------- */
@@ -430,32 +427,27 @@ async function runAll() {
   runLabel.textContent = "Running…";
 
   // Act 1 — just reveal
-  setActiveAct(1);
+  setActiveAct(1, { scroll: true });
   await sleep(800);
   showFlowArrow("flow-1-2");
 
   // Act 2 — extraction
-  setActiveAct(2);
+  setActiveAct(2, { scroll: true });
   await sleep(600);
   await runExtraction();
   await sleep(700);
 
-  // Act 3 — balance
-  setActiveAct(3);
+  // Act 3 — solving (inverse-derive missing parameters)
+  setActiveAct(3, { scroll: true });
+  await sleep(600);
+  await runDerivation();
+  await sleep(900);
+
+  // Act 4 — verifying (confirm the derived set is mass-balance consistent)
+  setActiveAct(4, { scroll: true });
   await sleep(600);
   await runBalanceCheck();
   await sleep(900);
-
-  // Act 4 — derivation
-  setActiveAct(4);
-  await sleep(600);
-  await runDerivation();
-  await sleep(700);
-
-  // Act 5 — simulation
-  setActiveAct(5);
-  await sleep(600);
-  await runSimulation();
 
   // mark complete
   epFill.style.width = "100%";
@@ -463,6 +455,16 @@ async function runAll() {
   runLabel.textContent = "Run again";
   runBtn.disabled = false;
   isRunning = false;
+
+  // Hand off to Hero 2 (the prediction slide below): smooth-scroll, then play curves.
+  await sleep(700);
+  const deck2 = document.getElementById("deck-2");
+  if (deck2) deck2.scrollIntoView({ behavior: "smooth", block: "start" });
+  // Wait for the smooth-scroll to settle, then trigger the curve animation.
+  await sleep(900);
+  if (typeof window.__playHero2Curves === "function") {
+    window.__playHero2Curves();
+  }
 }
 
 function reset() {
@@ -480,7 +482,8 @@ function reset() {
   document.getElementById("missing-status").textContent = "awaiting extraction…";
 
   document.querySelectorAll(".brow").forEach(b => b.classList.remove("ok", "bad", "checking"));
-  document.getElementById("violation").classList.remove("show");
+  const violation = document.getElementById("violation");
+  if (violation) violation.classList.remove("show");
 
   document.getElementById("solve-substitution").classList.remove("show");
   document.getElementById("solve-substitution").textContent = "";
@@ -492,7 +495,8 @@ function reset() {
     i.querySelector(".rec-val").textContent = "—";
   });
 
-  document.getElementById("sim-chart").innerHTML = "";
+  const simChart = document.getElementById("sim-chart");
+  if (simChart) simChart.innerHTML = "";
   document.querySelectorAll(".r-fill").forEach(f => f.style.width = "0%");
 
   document.querySelectorAll(".flow-arrow").forEach(a => a.classList.remove("show"));
@@ -501,8 +505,21 @@ function reset() {
 runBtn.addEventListener("click", runAll);
 resetBtn.addEventListener("click", reset);
 
-/* ---------- exports ---------- */
-document.getElementById("export-model").addEventListener("click", () => {
+// "See it run on a real drug" CTA in Hero 1: scroll to engine + auto-start the run.
+const ctaSeeItRun = document.getElementById("cta-see-it-run");
+if (ctaSeeItRun) {
+  ctaSeeItRun.addEventListener("click", (e) => {
+    e.preventDefault();
+    const engineSection = document.getElementById("engine");
+    if (engineSection) engineSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    // Give the smooth-scroll a moment, then begin the run.
+    setTimeout(() => { if (!isRunning) runAll(); }, 700);
+  });
+}
+
+/* ---------- exports (only bind if the buttons still exist; act 5 was removed) ---------- */
+const exportModelBtn = document.getElementById("export-model");
+if (exportModelBtn) exportModelBtn.addEventListener("click", () => {
   const model = {
     model: "gefitinib · 1-compartment oral PK + hepatic well-stirred",
     source: "Swaisland et al., 2005, Clin. Pharmacokinet. (adapted)",
@@ -538,7 +555,8 @@ document.getElementById("export-model").addEventListener("click", () => {
   URL.revokeObjectURL(url);
 });
 
-document.getElementById("export-audit").addEventListener("click", () => {
+const exportAuditBtn = document.getElementById("export-audit");
+if (exportAuditBtn) exportAuditBtn.addEventListener("click", () => {
   alert("In production: a signed PDF audit packet with full derivation chain, citation graph, and assumption ledger — submission-ready under FDAMA 2.0.");
 });
 

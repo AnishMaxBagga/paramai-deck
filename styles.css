@@ -39,7 +39,7 @@
   --shadow-lg:    0 24px 60px rgba(26, 24, 20, 0.12);
 
   /* Type */
-  --serif: "Fraunces", "Cormorant Garamond", "Times New Roman", Georgia, serif;
+  --serif: "Source Serif 4", "Source Serif Pro", "Cormorant Garamond", "Times New Roman", Georgia, serif;
   --sans:  "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   --mono:  "JetBrains Mono", "SF Mono", ui-monospace, Menlo, monospace;
 }
@@ -79,8 +79,8 @@ code, .mono { font-family: var(--mono); }
 h1, h2, h3, .display {
   font-family: var(--serif);
   font-weight: 500;
-  letter-spacing: -0.015em;
-  font-variation-settings: "opsz" 96;
+  letter-spacing: -0.01em;
+  font-variation-settings: "opsz" 60;
   margin: 0;
 }
 h1 em, h2 em, h3 em, .display em {
@@ -298,54 +298,2119 @@ p:last-child { margin-bottom: 0; }
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 /* ============================================================
-   HERO — quiet / restrained / typographic
-   Single statement carries the visual weight.
-   The interactive demo lives below in #engine.
+   HERO — narrative
+   Auto-advancing 3-scene story: problem → cause → solution.
+   Left side: rotating headline + persistent CTAs + scene dots.
+   Right side: rotating visual scenes that crossfade.
    ============================================================ */
-.hero-quiet {
-  padding: 120px 0 100px;
+.hero-narrative {
+  padding: 24px 0 32px;
+  height: calc(100vh - 72px);
+  display: flex;
+  align-items: stretch;
 }
-.hero-quiet-inner {
-  max-width: 920px;
-  margin: 0 auto;
-  text-align: left;
+.hero-narrative .container {
+  max-width: none;
+  padding: 0 48px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
-.hero-quiet-title {
+
+/* Stacked layout: headline on top, stage centerpiece, CTAs below */
+.narrative-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+.scene-headlines {
+  position: relative;
+  width: 100%;
+  max-width: 880px;
+  min-height: 4.2em;
+  text-align: center;
+  display: grid;
+  flex-shrink: 0;
+}
+
+.scene-headline {
+  grid-column: 1;
+  grid-row: 1;
   font-family: var(--serif);
-  font-size: clamp(48px, 7.2vw, 92px);
+  font-size: clamp(28px, 2.6vw, 40px);
   font-weight: 400;
-  letter-spacing: -0.03em;
-  line-height: 1.0;
-  margin: 0 0 36px;
+  letter-spacing: -0.012em;
+  line-height: 1.18;
   color: var(--text);
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.7s cubic-bezier(.22, .61, .36, 1),
+    transform 0.7s cubic-bezier(.22, .61, .36, 1);
+  pointer-events: none;
+  margin: 0;
 }
-.hero-quiet-title em {
+.scene-headline.shown {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.scene-headline em {
   font-style: italic;
   color: var(--rust);
-  font-variation-settings: "opsz" 96;
 }
-.hero-quiet-lede {
-  font-size: 19px;
-  color: var(--text-soft);
-  max-width: 640px;
-  margin: 0 0 40px;
-  line-height: 1.55;
+
+/* --- The stage: rectangular centerpiece --- */
+.narrative-stage {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
 }
-.hero-scroll-hint {
-  margin-top: 60px;
+
+.stage-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  background: var(--paper-2);
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.02), 0 12px 28px -16px rgba(0,0,0,0.10);
+}
+
+/* --- Bottom: dots + CTAs --- */
+.narrative-foot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.scene-dots {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+.scene-dot {
+  width: 22px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--paper-deep);
+  transition: background 0.4s ease, width 0.4s ease;
+}
+.scene-dot.active {
+  background: var(--rust);
+  width: 36px;
+}
+
+.narrative-scene {
+  position: absolute;
+  inset: 0;
+  padding: 36px 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+  opacity: 0;
+  transform: scale(0.98);
+  transition:
+    opacity 0.9s cubic-bezier(.22, .61, .36, 1),
+    transform 0.9s cubic-bezier(.22, .61, .36, 1);
+  pointer-events: none;
+}
+.narrative-scene.shown {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+.scene-eyebrow {
   font-family: var(--mono);
-  font-size: 14px;
+  font-size: 12.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+/* ============================================================
+   SCENE 0 — title / cover
+   ============================================================ */
+/* When scene 0 is the active scene, collapse the headline area entirely
+   so the title slide gets the full vertical space. */
+.scene-headlines:has(.scene-headline-empty.shown) {
+  min-height: 0;
+  margin-bottom: 0;
+}
+.scene-headline-empty {
+  min-height: 0;
+  height: 0;
+  padding: 0;
+  margin: 0;
+  visibility: hidden;
+}
+.title-viz {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 24px 48px;
+  min-height: 0;
+}
+.title-mark {
+  width: clamp(96px, 10vw, 160px);
+  height: clamp(96px, 10vw, 160px);
+}
+.title-wordmark-big {
+  font-family: var(--serif);
+  font-size: clamp(72px, 7vw, 120px);
+  font-weight: 500;
+  letter-spacing: -0.022em;
+  color: var(--text);
+  line-height: 1;
+}
+.title-wordmark-big .brand-accent {
+  color: var(--rust);
+  font-family: var(--mono);
+  font-weight: 600;
+}
+.title-byline {
+  margin-top: 24px;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: clamp(18px, 1.5vw, 24px);
   color: var(--text-muted);
   letter-spacing: 0.04em;
-  opacity: 0.7;
-  animation: hint-bounce 2.4s ease-in-out infinite;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
-@keyframes hint-bounce {
-  0%, 100% { transform: translateY(0); opacity: 0.4; }
-  50%      { transform: translateY(4px); opacity: 0.8; }
+.title-name { color: var(--text); }
+.title-email {
+  color: var(--rust);
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+.title-email:hover { opacity: 0.7; }
+
+/* Scene 0 choreography: each element fades up in sequence */
+.choreo-title {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.7s cubic-bezier(.22, .61, .36, 1),
+    transform 0.7s cubic-bezier(.22, .61, .36, 1);
+}
+.narrative-scene.shown.choreo-play .choreo-title { opacity: 1; transform: none; }
+.narrative-scene.shown.choreo-play .title-mark         { transition-delay: 0.10s; }
+.narrative-scene.shown.choreo-play .title-wordmark-big { transition-delay: 0.30s; }
+.narrative-scene.shown.choreo-play .title-byline       { transition-delay: 0.55s; }
+
+/* ============================================================
+   SHARED — two-column scene layout
+   ============================================================ */
+.scene-two-col {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 48px;
+  width: 100%;
+  min-height: 0;
+  align-items: center;
+}
+.scene-col { min-width: 0; min-height: 0; }
+.scene-viz {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+.scene-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 32px;
+  padding-right: 16px;
+}
+
+/* Pull-quote pattern (used in scene 1 and others) */
+.scene-quote {
+  margin: 0;
+  padding: 0;
+  border-left: 3px solid var(--rust);
+  padding-left: 22px;
+}
+.scene-quote-text {
+  font-family: var(--serif);
+  font-size: clamp(22px, 1.9vw, 30px);
+  font-style: italic;
+  line-height: 1.25;
+  color: var(--text);
+  margin: 0 0 14px;
+  letter-spacing: -0.005em;
+}
+.scene-quote-attr {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+/* Supporting stat row */
+.scene-stat-row {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+}
+.scene-stat-number {
+  font-family: var(--serif);
+  font-size: clamp(34px, 3vw, 48px);
+  font-weight: 500;
+  color: var(--rust);
+  letter-spacing: -0.012em;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.scene-stat-text {
+  font-family: var(--sans);
+  font-size: 14.5px;
+  color: var(--text-soft);
+  line-height: 1.45;
+}
+
+/* Choreographed text entrance — items inside an active scene fade up in sequence */
+.choreo-text-in {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.7s cubic-bezier(.22, .61, .36, 1),
+    transform 0.7s cubic-bezier(.22, .61, .36, 1);
+}
+.narrative-scene.shown.choreo-play .scene-quote-text .choreo-text-in,
+.narrative-scene.shown.choreo-play .choreo-text-in {
+  opacity: 1;
+  transform: none;
+}
+.narrative-scene.shown.choreo-play .scene-quote .choreo-text-in:nth-child(1),
+.narrative-scene.shown.choreo-play .scene-quote-text .choreo-text-in {
+  transition-delay: 1.0s;
+}
+.narrative-scene.shown.choreo-play .scene-quote-attr.choreo-text-in {
+  transition-delay: 1.5s;
+}
+.narrative-scene.shown.choreo-play .scene-stat-row.choreo-text-in {
+  transition-delay: 2.0s;
+}
+
+/* ============================================================
+   SCENE 1 — failure timeline
+   ============================================================ */
+.timeline-viz {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  margin: 0 auto;
+  min-height: 0;
+}
+.timeline-svg {
+  width: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+}
+
+/* Scene 1 choreography */
+.choreo-track {
+  stroke-dasharray: 900;
+  stroke-dashoffset: 900;
+  transition: stroke-dashoffset 1.4s cubic-bezier(.4, 0, .2, 1);
+}
+.narrative-scene.shown.choreo-play .choreo-track {
+  stroke-dashoffset: 0;
+}
+.choreo-tick,
+.choreo-phase {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.narrative-scene.shown.choreo-play .choreo-tick[data-tick="0"],
+.narrative-scene.shown.choreo-play .choreo-phase[data-tick="0"] { opacity: 1; transition-delay: 0.30s; }
+.narrative-scene.shown.choreo-play .choreo-tick[data-tick="1"],
+.narrative-scene.shown.choreo-play .choreo-phase[data-tick="1"] { opacity: 1; transition-delay: 0.55s; }
+.narrative-scene.shown.choreo-play .choreo-tick[data-tick="2"],
+.narrative-scene.shown.choreo-play .choreo-phase[data-tick="2"] { opacity: 1; transition-delay: 0.80s; }
+.narrative-scene.shown.choreo-play .choreo-tick[data-tick="3"],
+.narrative-scene.shown.choreo-play .choreo-phase[data-tick="3"] { opacity: 1; transition-delay: 1.05s; }
+.narrative-scene.shown.choreo-play .choreo-tick[data-tick="4"],
+.narrative-scene.shown.choreo-play .choreo-phase[data-tick="4"] { opacity: 1; transition-delay: 1.20s; }
+
+.choreo-dlt-connector {
+  stroke: var(--crimson);
+  stroke-width: 1.5;
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  opacity: 0.7;
+  transition: stroke-dashoffset 0.5s cubic-bezier(.4, 0, .2, 1) 0.65s;
+}
+.narrative-scene.shown.choreo-play .choreo-dlt-connector { stroke-dashoffset: 0; }
+.choreo-dlt-dot {
+  opacity: 0;
+  transform-origin: 285px 200px;
+  transform: scale(0);
+  transition: opacity 0.4s ease 0.55s, transform 0.5s cubic-bezier(.34, 1.56, .64, 1) 0.55s;
+}
+.narrative-scene.shown.choreo-play .choreo-dlt-dot { opacity: 1; transform: scale(1); }
+.choreo-dlt-stamp {
+  opacity: 0;
+  transform-origin: 285px 280px;
+  transform: scale(0.6) translateY(-8px);
+  transition: opacity 0.35s ease 1.15s, transform 0.45s cubic-bezier(.34, 1.56, .64, 1) 1.15s;
+}
+.narrative-scene.shown.choreo-play .choreo-dlt-stamp { opacity: 1; transform: scale(1) translateY(0); }
+.tl-caption {
+  text-align: center;
+  margin: 0;
+  padding: 0 12px;
+}
+.tl-quote {
+  display: block;
+  font-family: var(--serif);
+  font-size: 19px;
+  font-style: italic;
+  color: var(--text);
+  font-weight: 500;
+  line-height: 1.3;
+}
+.tl-quote-attr {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  margin-top: 8px;
+}
+.tl-track {
+  stroke: var(--text-soft);
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: 0.7;
+}
+.tl-ticks line {
+  stroke: var(--text-soft);
+  stroke-width: 1.6;
+  opacity: 0.6;
+}
+.tl-label {
+  font-family: var(--mono);
+  font-size: 13px;
+  fill: var(--text-muted);
+  text-anchor: middle;
+  letter-spacing: 0.04em;
+}
+.tl-phase {
+  font-family: var(--sans);
+  font-size: 16px;
+  fill: var(--text);
+  text-anchor: middle;
+  font-weight: 500;
+}
+.tl-end {
+  fill: var(--crimson);
+}
+.tl-failed-stamp rect {
+  fill: var(--crimson);
+  fill-opacity: 0.92;
+}
+.tl-failed-stamp text {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  fill: var(--paper);
+  text-anchor: middle;
+  letter-spacing: 0.22em;
+}
+
+/* ============================================================
+   SCENE 2 — contradictory papers
+   ============================================================ */
+.papers-viz {
+  flex: 1;
+  position: relative;
+  padding: 12px;
+}
+.paper-card-mini {
+  position: absolute;
+  width: 60%;
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  border-radius: 6px;
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.4s ease;
+}
+.paper-card-mini:hover { transform: translateY(-2px) rotate(0deg) !important; }
+
+.paper-mini-1 {
+  top: 0;
+  left: 0;
+  transform: rotate(-3deg);
+  z-index: 3;
+}
+.paper-mini-2 {
+  top: 30%;
+  right: 0;
+  transform: rotate(2.5deg);
+  z-index: 2;
+}
+.paper-mini-3 {
+  bottom: 6%;
+  left: 12%;
+  transform: rotate(-1.5deg);
+  z-index: 1;
+}
+
+.pm-title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--text-soft);
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--paper-line);
+}
+.pm-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  padding: 2px 0;
+}
+.pm-key { color: var(--text-muted); }
+.pm-val { color: var(--text); font-weight: 500; }
+.pm-flag { color: var(--crimson); font-weight: 600; }
+.pm-missing { color: var(--text-muted); font-style: italic; }
+
+.contradiction-arrow {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  background: var(--crimson);
+  color: var(--paper);
+  border-radius: 4px;
+  box-shadow: var(--shadow-sm);
+  transform: rotate(-2deg);
+}
+
+/* ============================================================
+   SCENE 3 — clean concentration-time curve
+   ============================================================ */
+.curve-viz {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 0 auto;
+  min-height: 0;
+}
+.curve-svg {
+  width: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+}
+/* Hero 2's curve SVG: fill width, but stay inside the stage frame's vertical bounds */
+.curve-svg-deck2 {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+}
+
+/* ============================================================
+   SCENE — competitive landscape quadrant
+   ============================================================ */
+.quadrant-viz {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 0 auto;
+  min-height: 0;
+  padding: 8px;
+}
+.quadrant-svg {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  display: block;
+}
+.q-axis {
+  stroke: var(--text);
+  stroke-width: 1.5;
+  fill: none;
+}
+.q-axis-mid {
+  stroke: var(--text-muted);
+  stroke-width: 1;
+  stroke-dasharray: 4 6;
+  opacity: 0.5;
+}
+.q-arrow { fill: var(--text); }
+.q-axis-label {
+  font-family: var(--mono);
+  font-size: 13px;
+  fill: var(--text-soft);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.q-quadrant {
+  fill: var(--rust);
+  opacity: 0.05;
+}
+
+/* Competitor points (the non-ParamAI clusters) */
+.q-point circle {
+  fill: var(--paper-2);
+  stroke: var(--text-soft);
+  stroke-width: 1.5;
+}
+.q-point-label {
+  font-family: var(--mono);
+  font-size: 13px;
+  fill: var(--text);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.q-point-sub {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 12px;
+  fill: var(--text-muted);
+}
+
+/* ParamAI: filled rust with a soft halo + pulsing outer ring */
+.q-point-paramai .q-point-paramai-dot {
+  fill: var(--rust);
+  stroke: var(--rust);
+  stroke-width: 2;
+}
+.q-point-paramai-halo {
+  fill: var(--rust);
+  opacity: 0.15;
+}
+/* Pulsing ring: JS animates r + opacity per frame (see setupHero2 in app.js).
+   No CSS keyframes — animating SVG `r` via CSS is unreliable across browsers. */
+.q-point-paramai-pulse {
+  fill: none;
+  stroke: var(--rust);
+  stroke-width: 3;
+  opacity: 0;
+}
+.q-point-label-paramai { fill: var(--rust); font-size: 16px; }
+.q-point-sub-paramai   { fill: var(--rust); opacity: 0.85; font-size: 13px; }
+
+.q-annotation {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 14px;
+  fill: var(--text-soft);
+}
+
+/* Choreography — points pop in one by one when the scene activates */
+.choreo-q-point {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.5s cubic-bezier(.22, .61, .36, 1),
+    transform 0.5s cubic-bezier(.34, 1.56, .64, 1);
+}
+.narrative-scene.shown.choreo-play .choreo-q-point[data-q="0"] { opacity: 1; transform: none; transition-delay: 0.20s; }
+.narrative-scene.shown.choreo-play .choreo-q-point[data-q="1"] { opacity: 1; transform: none; transition-delay: 0.40s; }
+.narrative-scene.shown.choreo-play .choreo-q-point[data-q="2"] { opacity: 1; transform: none; transition-delay: 0.60s; }
+.narrative-scene.shown.choreo-play .choreo-q-point[data-q="3"] { opacity: 1; transform: none; transition-delay: 0.80s; }
+.narrative-scene.shown.choreo-play .choreo-q-point[data-q="4"] {
+  opacity: 1;
+  transform: none;
+  transition-delay: 1.20s;
+}
+
+/* ============================================================
+   MARKET SIZING — bubbles left, label column right
+   ============================================================ */
+.market-viz {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 48px;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  min-height: 0;
+  padding: 0 24px;
+}
+.market-bubbles {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+}
+.market-svg {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  display: block;
+}
+.m-bubble {
+  fill: var(--rust);
+  stroke: var(--rust);
+  stroke-width: 1.5;
+}
+.m-bubble-tam { fill-opacity: 0.06; stroke-opacity: 0.25; }
+.m-bubble-sam { fill-opacity: 0.10; stroke-opacity: 0.45; }
+.m-bubble-som { fill-opacity: 0.40; stroke-opacity: 0.95; }
+
+/* Right column: three stacked tier blocks */
+.market-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  min-width: 0;
+}
+.market-tier {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 18px;
+  border-left: 3px solid var(--rust);
+}
+.market-tier:nth-child(1) { border-left-color: rgba(185, 78, 42, 0.35); }
+.market-tier:nth-child(2) { border-left-color: rgba(185, 78, 42, 0.65); }
+.market-tier:nth-child(3) { border-left-color: var(--rust); }
+.market-tier-name {
+  font-family: var(--mono);
+  font-size: 15px;
+  color: var(--rust);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+.market-tier-value {
+  font-family: var(--serif);
+  font-size: clamp(42px, 3.6vw, 58px);
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: -0.012em;
+  line-height: 1.05;
+}
+.market-tier-detail {
+  font-family: var(--sans);
+  font-size: 16px;
+  color: var(--text-soft);
+  line-height: 1.45;
+}
+
+.choreo-m {
+  opacity: 0;
+  transform: translateY(8px);
+  transform-origin: center;
+  transform-box: fill-box;
+  transition:
+    opacity 0.6s cubic-bezier(.22, .61, .36, 1),
+    transform 0.6s cubic-bezier(.34, 1.56, .64, 1);
+}
+.narrative-scene.shown.choreo-play .choreo-m[data-m="0"] { opacity: 1; transform: none; transition-delay: 0.10s; }
+.narrative-scene.shown.choreo-play .choreo-m[data-m="1"] { opacity: 1; transform: none; transition-delay: 0.50s; }
+.narrative-scene.shown.choreo-play .choreo-m[data-m="2"] { opacity: 1; transform: none; transition-delay: 0.90s; }
+
+/* ============================================================
+   VALUE TO PHARMA — measured rows
+   ============================================================ */
+.value-viz {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  min-height: 0;
+  padding: 0 16px;
+}
+.value-table {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.value-thead,
+.value-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  align-items: center;
+  gap: 28px;
+  padding: 18px 8px;
+}
+.value-thead {
+  border-bottom: 2px solid var(--text);
+  padding-bottom: 12px;
+}
+.value-row {
+  border-bottom: 1px solid var(--paper-line);
+}
+.value-row:last-child { border-bottom: none; }
+
+.value-th {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.value-th-before { text-align: center; color: var(--text-muted); }
+.value-th-after  { text-align: center; color: var(--rust); }
+
+.value-row-label {
+  font-family: var(--serif);
+  font-size: 21px;
+  color: var(--text);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  line-height: 1.25;
+}
+.value-row-before {
+  font-family: var(--mono);
+  font-size: 16px;
+  color: var(--text-soft);
+  text-align: center;
+}
+.value-row-after {
+  font-family: var(--mono);
+  font-size: 18px;
+  color: var(--rust);
+  font-weight: 600;
+  text-align: center;
+}
+.choreo-v {
+  opacity: 0;
+  transform: translateX(-6px);
+  transition:
+    opacity 0.5s cubic-bezier(.22, .61, .36, 1),
+    transform 0.5s cubic-bezier(.22, .61, .36, 1);
+}
+.narrative-scene.shown.choreo-play .choreo-v[data-v="0"] { opacity: 1; transform: none; transition-delay: 0.10s; }
+.narrative-scene.shown.choreo-play .choreo-v[data-v="1"] { opacity: 1; transform: none; transition-delay: 0.28s; }
+.narrative-scene.shown.choreo-play .choreo-v[data-v="2"] { opacity: 1; transform: none; transition-delay: 0.46s; }
+.narrative-scene.shown.choreo-play .choreo-v[data-v="3"] { opacity: 1; transform: none; transition-delay: 0.64s; }
+.narrative-scene.shown.choreo-play .choreo-v[data-v="4"] { opacity: 1; transform: none; transition-delay: 0.82s; }
+
+/* ============================================================
+   CONCLUSION SCENE — wordmark, pitch, headshot, QR
+   ============================================================ */
+.closer-viz {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 32px;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  min-height: 0;
+  padding: 4px 12px;
+  align-items: center;
+  overflow: hidden;
+}
+.closer-left {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  min-height: 0;
+}
+.closer-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-width: 0;
+  min-height: 0;
+}
+.closer-wordmark {
+  font-family: var(--serif);
+  font-size: clamp(52px, 5vw, 82px);
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.closer-wordmark .brand-accent {
+  color: var(--rust);
+  font-family: var(--mono);
+  font-weight: 600;
+}
+.closer-pitch {
+  font-family: var(--serif);
+  font-size: clamp(17px, 1.5vw, 22px);
+  line-height: 1.45;
+  color: var(--text);
+  margin: 0;
+  max-width: 640px;
+  letter-spacing: -0.003em;
+}
+.closer-pitch em {
+  font-style: italic;
+  color: var(--rust);
+}
+.closer-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: var(--mono);
+  font-size: 17px;
+  margin-top: 6px;
+}
+.closer-name { color: var(--text); font-weight: 600; }
+.closer-email {
+  color: var(--rust);
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+.closer-email:hover { opacity: 0.7; }
+.closer-headshot {
+  width: clamp(140px, 16vw, 220px);
+  height: clamp(140px, 16vw, 220px);
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: 50% 25%;
+  box-shadow: 0 8px 22px -10px rgba(14, 17, 22, 0.30);
+  border: 2px solid var(--paper);
+}
+.closer-qr-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.closer-qr {
+  width: clamp(130px, 14vw, 180px);
+  height: clamp(130px, 14vw, 180px);
+  border-radius: 6px;
+  background: var(--paper);
+  display: block;
+}
+.closer-qr-label {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Choreography — elements fade in sequence */
+.choreo-c {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.6s cubic-bezier(.22, .61, .36, 1),
+    transform 0.6s cubic-bezier(.22, .61, .36, 1);
+}
+.narrative-scene.shown.choreo-play .choreo-c[data-c="0"] { opacity: 1; transform: none; transition-delay: 0.10s; }
+.narrative-scene.shown.choreo-play .choreo-c[data-c="1"] { opacity: 1; transform: none; transition-delay: 0.35s; }
+.narrative-scene.shown.choreo-play .choreo-c[data-c="2"] { opacity: 1; transform: none; transition-delay: 0.60s; }
+.narrative-scene.shown.choreo-play .choreo-c[data-c="3"] { opacity: 1; transform: none; transition-delay: 0.20s; }
+.narrative-scene.shown.choreo-play .choreo-c[data-c="4"] { opacity: 1; transform: none; transition-delay: 0.45s; }
+
+.cv-window {
+  fill: rgba(124, 138, 61, 0.12);
+  stroke: rgba(124, 138, 61, 0.4);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+.cv-window-label {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  fill: var(--olive);
+  text-anchor: middle;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.cv-axis {
+  stroke: var(--text-muted);
+  stroke-width: 1;
+  opacity: 0.5;
+}
+.cv-ylabel, .cv-xlabel {
+  font-family: var(--mono);
+  font-size: 9px;
+  fill: var(--text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.cv-xlabel { text-anchor: end; }
+.cv-curve {
+  fill: none;
+  stroke: var(--olive);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 800;
+  stroke-dashoffset: 800;
+  transition: stroke-dashoffset 2.2s cubic-bezier(.4, 0, .2, 1);
+}
+.cv-curve.drawn { stroke-dashoffset: 0; }
+.cv-annotation {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 12px;
+  fill: var(--text-soft);
+  text-anchor: middle;
+}
+
+/* toxic exposure band + naive overshoot curve, scene 6 */
+.cv-toxic {
+  fill: rgba(176, 56, 38, 0.10);
+  stroke: rgba(176, 56, 38, 0.35);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+.cv-toxic-label {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  fill: var(--crimson);
+  text-anchor: middle;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.cv-curve-naive {
+  stroke: var(--crimson);
+  stroke-width: 2.4;
+  opacity: 0.9;
+}
+.cv-curve-good { stroke: var(--olive); }
+
+/* AUC fills under each curve */
+.cv-auc {
+  stroke: none;
+  opacity: 0.10;
+}
+.cv-auc-naive { fill: var(--crimson); }
+.cv-auc-good  { fill: var(--olive); }
+
+/* Right-edge legend block */
+.cv-legend-swatch { stroke-width: 3; stroke-linecap: round; }
+.cv-legend-swatch-good  { stroke: var(--olive); }
+.cv-legend-swatch-naive { stroke: var(--crimson); }
+.cv-legend-swatch-obs   { stroke: var(--text-soft); stroke-dasharray: 3 3; opacity: 0.7; }
+.cv-legend-name {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.cv-legend-name-good  { fill: var(--olive); }
+.cv-legend-name-naive { fill: var(--crimson); }
+.cv-legend-name-obs   { fill: var(--text); }
+.cv-legend-auc {
+  font-family: var(--mono);
+  font-size: 10px;
+  fill: var(--text-soft);
+  letter-spacing: 0.02em;
+}
+.cv-legend-auc-obs { fill: var(--text-muted); }
+.cv-legend-ratio {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 11px;
+  fill: var(--text-muted);
+}
+.cv-legend-ratio-naive { fill: var(--crimson); }
+.cv-asterisk {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-style: normal;
+  fill: var(--crimson);
+}
+
+/* Observed clinical samples — dashed gray connector + small dots */
+.cv-observed-line {
+  fill: none;
+  stroke: var(--text-soft);
+  stroke-width: 1.4;
+  stroke-dasharray: 4 4;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.cv-observed-line.drawn { opacity: 0.55; }
+.cv-observed-dot {
+  fill: var(--text);
+  opacity: 0;
+  stroke: var(--paper-2);
+  stroke-width: 1;
+  transform: scale(0.4);
+  transform-origin: center;
+  transform-box: fill-box;
+  transition: opacity 0.3s ease, transform 0.4s cubic-bezier(.34, 1.56, .64, 1);
+}
+.cv-observed-dot.drawn { opacity: 0.85; transform: scale(1); }
+
+/* While Hero 2 is pending its in-view trigger, keep the curves at their starting state */
+.d2-curves-pending .cv-curve { stroke-dashoffset: 800; }
+
+/* ============================================================
+   SCENE 2 — clinical trial failure funnel
+   ============================================================ */
+.funnel-viz {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin: 0 auto;
+  min-height: 0;
+  padding: 8px 16px;
+  justify-content: center;
+}
+.funnel-headline {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.funnel-stat {
+  font-family: var(--serif);
+  font-size: clamp(48px, 5vw, 72px);
+  font-weight: 500;
+  color: var(--crimson);
+  letter-spacing: -0.014em;
+  line-height: 1;
+}
+.funnel-stat-label {
+  font-family: var(--sans);
+  font-size: 15px;
+  color: var(--text-soft);
+  max-width: 520px;
+  line-height: 1.45;
+}
+.funnel-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Timeline strip below the funnel (combined scene).
+   margin-top is small/negative so the timeline sits close to the bars. */
+.timeline-strip {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-top: -8px;
+}
+.tl-phase-strip {
+  font-family: var(--sans);
+  font-size: 15px;
+  fill: var(--text);
+  text-anchor: middle;
+  font-weight: 600;
+}
+.tl-pop {
+  font-family: var(--mono);
+  font-size: 11px;
+  fill: var(--text-muted);
+  text-anchor: middle;
+  letter-spacing: 0.03em;
+}
+.tl-paramai-dot {
+  fill: var(--rust);
+}
+.tl-paramai-stamp rect {
+  fill: var(--rust);
+  fill-opacity: 0.95;
+}
+.tl-paramai-stamp text {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  fill: var(--paper);
+  text-anchor: middle;
+  letter-spacing: 0.20em;
+}
+.funnel-bar rect {
+  transition: fill 0.5s ease, opacity 0.5s ease;
+}
+.funnel-bar-1 rect { fill: var(--rust); opacity: 0.85; }
+.funnel-bar-2 rect { fill: var(--rust); opacity: 0.65; }
+.funnel-bar-3 rect { fill: var(--rust); opacity: 0.45; }
+.funnel-bar-4 rect { fill: var(--olive); opacity: 0.85; }
+.funnel-bar-label {
+  font-family: var(--mono);
+  font-size: 14px;
+  fill: var(--text);
+  text-anchor: middle;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.funnel-bar-count {
+  font-family: var(--serif);
+  font-size: 22px;
+  fill: var(--text);
+  text-anchor: middle;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+.funnel-bar-1 .funnel-bar-count { fill: var(--rust); }
+.funnel-bar-4 .funnel-bar-count { fill: var(--olive); }
+.funnel-drop {
+  font-family: var(--mono);
+  font-size: 16px;
+  fill: var(--crimson);
+  text-anchor: middle;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.funnel-drop-cause {
+  font-family: var(--mono);
+  font-size: 11px;
+  fill: var(--text-muted);
+  text-anchor: middle;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.funnel-caption {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(22px, 2vw, 30px);
+  color: var(--text);
+  text-align: center;
+  margin: 16px auto 0;
+  line-height: 1.4;
+  max-width: 920px;
+}
+
+/* Scene 2 choreography:
+   All bars start at Phase I's full height (y=50, height=220), then Phase II,
+   III, Approved shrink in sequence — the visitor watches attrition happen.
+   Drop labels fade in as each bar finishes shrinking. */
+.funnel-bar {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.narrative-scene.shown.choreo-play .funnel-bar { opacity: 1; }
+
+.funnel-bar rect {
+  transition:
+    y 0.9s cubic-bezier(.4, 0, .2, 1),
+    height 0.9s cubic-bezier(.4, 0, .2, 1),
+    fill 0.5s ease,
+    opacity 0.5s ease;
+}
+
+/* Bars 2/3/4 start at Phase I's full height, then shrink to their real heights.
+   Their x positions stay the same; only y and height animate. */
+.funnel-bar-2 rect,
+.funnel-bar-3 rect,
+.funnel-bar-4 rect {
+  y: 50;
+  height: 220;
+}
+.narrative-scene.shown.choreo-play .funnel-bar-2 rect {
+  y: 132;  height: 138;
+  transition-delay: 0.40s, 0.40s, 0s, 0s;
+}
+.narrative-scene.shown.choreo-play .funnel-bar-3 rect {
+  y: 202;  height: 68;
+  transition-delay: 0.80s, 0.80s, 0s, 0s;
+}
+.narrative-scene.shown.choreo-play .funnel-bar-4 rect {
+  y: 244;  height: 26;
+  transition-delay: 1.20s, 1.20s, 0s, 0s;
+}
+
+/* Phase I bar fades in immediately; others fade in just before they shrink */
+.narrative-scene.shown.choreo-play .funnel-bar-1 { transition-delay: 0.10s; }
+.narrative-scene.shown.choreo-play .funnel-bar-2 { transition-delay: 0.25s; }
+.narrative-scene.shown.choreo-play .funnel-bar-3 { transition-delay: 0.40s; }
+.narrative-scene.shown.choreo-play .funnel-bar-4 { transition-delay: 0.55s; }
+
+/* Drop labels fade in after the corresponding bar finishes shrinking */
+.funnel-drop,
+.funnel-drop-cause {
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.5s cubic-bezier(.22, .61, .36, 1),
+    transform 0.5s cubic-bezier(.22, .61, .36, 1);
+}
+.narrative-scene.shown.choreo-play .funnel-drop[data-bar="1"],
+.narrative-scene.shown.choreo-play .funnel-drop-cause[data-bar="1"] { opacity: 1; transform: none; transition-delay: 1.35s; }
+.narrative-scene.shown.choreo-play .funnel-drop[data-bar="2"],
+.narrative-scene.shown.choreo-play .funnel-drop-cause[data-bar="2"] { opacity: 1; transform: none; transition-delay: 1.75s; }
+.narrative-scene.shown.choreo-play .funnel-drop[data-bar="3"],
+.narrative-scene.shown.choreo-play .funnel-drop-cause[data-bar="3"] { opacity: 1; transform: none; transition-delay: 2.15s; }
+
+/* ============================================================
+   SCENE 2 (DEPRECATED) — adverse drug reaction grid
+   ============================================================ */
+.adr-viz {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  min-height: 0;
+}
+.adr-headline {
+  text-align: center;
+}
+.adr-stat-large {
+  font-family: var(--serif);
+  font-size: 76px;
+  font-weight: 500;
+  color: var(--crimson);
+  letter-spacing: -0.012em;
+  line-height: 1;
+}
+.adr-stat-label {
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--text-soft);
+  line-height: 1.4;
+  max-width: 460px;
+  margin: 14px auto 0;
+}
+.adr-stat-label sup { color: var(--text-muted); }
+.adr-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 5px;
+  padding: 8px 4px;
+  min-height: 0;
+  width: 100%;
+}
+.adr-grid::before { content: none; }
+.adr-grid::before {
+  /* generated content; rendered via background pattern of "figures" */
+  content: "";
+}
+/* We'll render figures with ::before per cell via JS-injected divs.
+   For pure-CSS approach, use 200 cells via grid + nth-child colors. */
+.adr-cell {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  background: var(--paper-deep);
+  border-radius: 2px;
+  opacity: 0.65;
+}
+.adr-cell-bad {
+  background: var(--crimson);
+  opacity: 1;
+  box-shadow: 0 0 0 1px var(--crimson);
+}
+.adr-foot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--text-soft);
+  margin-top: 14px;
+  line-height: 1.4;
+}
+.adr-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.adr-dot-bad { background: var(--crimson); }
+
+/* ============================================================
+   SCENE 3 — body as a black box
+   ============================================================ */
+.blackbox-viz {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  margin: 0 auto;
+  min-height: 0;
+  gap: 12px;
+}
+.bb-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+  width: 100%;
+  padding: 0 8px;
+  flex-shrink: 0;
+}
+.bb-stat {
+  border-left: 3px solid var(--rust);
+  padding-left: 16px;
+}
+.bb-stat-num {
+  font-family: var(--serif);
+  font-size: clamp(24px, 2.2vw, 34px);
+  font-weight: 500;
+  color: var(--rust);
+  letter-spacing: -0.012em;
+  line-height: 1;
+}
+.bb-stat-label {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--text-soft);
+  margin-top: 6px;
+  line-height: 1.35;
+}
+.bb-svg-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bb-caption {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(18px, 1.6vw, 24px);
+  color: var(--text);
+  text-align: center;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   SCENE 3 — extract → verify → derive pipeline
+   ============================================================ */
+.pipeline-viz {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 0;
+  padding: 8px 16px;
+}
+.pipe-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 18px;
+  background: var(--paper-2);
+  border: 1px solid var(--paper-line);
+  border-radius: 12px;
+  min-width: 0;
+}
+.pipe-step-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--rust);
+  font-weight: 600;
+}
+.pipe-step-title {
+  font-family: var(--serif);
+  font-size: clamp(22px, 2vw, 30px);
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.pipe-step-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 0;
+  padding: 8px 0;
+}
+.pipe-step-caption {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  color: var(--text-muted);
+  text-align: center;
+  font-style: italic;
+}
+.pipe-connector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--serif);
+  font-size: 28px;
+  color: var(--rust);
+  opacity: 0.6;
+  flex-shrink: 0;
+  width: 28px;
+}
+
+/* Step 1: paper + extracted params */
+.pipe-paper {
+  width: 64px;
+  height: 86px;
+  background: var(--paper);
+  border: 1px solid var(--paper-deep);
+  border-radius: 3px;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 2px 6px -2px rgba(0,0,0,0.08);
+  flex-shrink: 0;
+}
+.pipe-paper-line {
+  height: 3px;
+  background: var(--text-muted);
+  opacity: 0.45;
+  border-radius: 2px;
+}
+.pipe-paper-line.short { width: 70%; }
+.pipe-arrow-extract {
+  font-family: var(--mono);
+  font-size: 18px;
+  color: var(--rust);
+  margin: 0 8px;
+  opacity: 0.7;
+}
+.pipe-params {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.pipe-param {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  font-family: var(--mono);
+  font-size: 13px;
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+.pp-k { color: var(--text-muted); font-weight: 500; }
+.pp-v { color: var(--text); font-weight: 600; }
+.pp-strike { text-decoration: line-through; text-decoration-thickness: 1.5px; color: var(--crimson); }
+.pp-good { color: var(--olive); }
+
+/* Step 2: verify checklist */
+.pipe-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 200px;
+}
+.pipe-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 7px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--paper-line);
+  background: var(--paper);
+}
+.pipe-check .pc-mark {
+  font-size: 14px;
+  font-weight: 700;
+  width: 16px;
+  text-align: center;
+}
+.pipe-check-ok          { border-left: 3px solid var(--olive); }
+.pipe-check-ok .pc-mark { color: var(--olive); }
+.pipe-check-bad         { border-left: 3px solid var(--crimson); background: rgba(176,56,38,0.05); }
+.pipe-check-bad .pc-mark{ color: var(--crimson); }
+.pc-k { color: var(--text); font-weight: 500; }
+
+/* Step 3: derive */
+.pipe-derive {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.pipe-derive-old,
+.pipe-derive-new {
+  display: flex;
+  gap: 14px;
+  font-family: var(--mono);
+  font-size: 16px;
+  padding: 8px 18px;
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  border-radius: 6px;
+  min-width: 110px;
+  justify-content: space-between;
+}
+.pipe-derive-old { border-left: 3px solid var(--crimson); }
+.pipe-derive-new { border-left: 3px solid var(--olive); background: rgba(124,138,61,0.06); }
+.pipe-derive-arrow {
+  font-family: var(--mono);
+  font-size: 22px;
+  color: var(--rust);
+  font-weight: 600;
+}
+
+/* ====== Pipeline choreography — JS-driven, engine-demo style ====== */
+/* Each pipe-step card starts dimmed; gets activated by JS */
+.pipe-step {
+  opacity: 0.35;
+  transform: translateY(6px);
+  transition:
+    opacity 0.4s cubic-bezier(.22, .61, .36, 1),
+    transform 0.4s cubic-bezier(.22, .61, .36, 1),
+    border-color 0.4s ease,
+    box-shadow 0.4s ease;
+}
+.pipe-step.pipe-active {
+  opacity: 1;
+  transform: none;
+  border-color: var(--rust);
+  box-shadow: 0 6px 20px -10px rgba(185, 78, 42, 0.25);
+}
+
+/* Step 1 extracted-values cascade */
+.choreo-pipe-val {
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+.choreo-pipe-val.pipe-on {
+  opacity: 1;
+  transform: none;
+}
+
+/* Step 2 check rows: hidden → checking pulse → resolved */
+.choreo-pipe-check {
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease,
+    background 0.3s ease,
+    border-color 0.3s ease;
+}
+.choreo-pipe-check.pipe-on {
+  opacity: 1;
+  transform: none;
+}
+.choreo-pipe-check.pipe-checking {
+  background: rgba(185, 78, 42, 0.08);
+  border-color: var(--rust);
+}
+/* While checking, the mark pulses (the row glows rust). Once resolved (pipe-ok-done / pipe-bad-done),
+   the mark settles to its native color via the .pipe-check-ok / .pipe-check-bad rules. */
+.choreo-pipe-check.pipe-checking .pc-mark {
+  color: var(--rust);
+  animation: pipe-pulse 0.5s ease-in-out infinite;
+}
+@keyframes pipe-pulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+
+/* Step 3 derive: old → arrow → new */
+.choreo-pipe-old,
+.choreo-pipe-arrow,
+.choreo-pipe-new {
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease;
+}
+.choreo-pipe-old.pipe-on,
+.choreo-pipe-arrow.pipe-on,
+.choreo-pipe-new.pipe-on {
+  opacity: 1;
+  transform: none;
+}
+
+/* Scene 2 choreography: stats fade in after the box appears */
+.narrative-scene.shown.choreo-play .bb-stat.choreo-text-in:nth-child(1) { transition-delay: 0.40s; }
+.narrative-scene.shown.choreo-play .bb-stat.choreo-text-in:nth-child(2) { transition-delay: 0.65s; }
+.narrative-scene.shown.choreo-play .bb-stat.choreo-text-in:nth-child(3) { transition-delay: 0.90s; }
+.narrative-scene.shown.choreo-play .bb-stat.choreo-text-in:nth-child(4) { transition-delay: 1.15s; }
+.blackbox-svg {
+  width: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+}
+.bb-iolabel {
+  font-family: var(--mono);
+  font-size: 28px;
+  fill: var(--text);
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.bb-arrow-in,
+.bb-arrow-out {
+  stroke: var(--text-soft);
+  stroke-width: 3;
+  fill: none;
+}
+.bb-arrow-head { fill: var(--text-soft); }
+.bb-box {
+  fill: var(--text);
+  stroke: var(--text);
+  stroke-width: 1;
+}
+.bb-box-label {
+  font-family: var(--mono);
+  font-size: 26px;
+  fill: var(--paper);
+  text-anchor: middle;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.bb-box-q {
+  font-family: var(--serif);
+  font-size: 220px;
+  fill: var(--rust);
+  text-anchor: middle;
+  font-weight: 500;
+}
+.bb-annotation {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 18px;
+  fill: var(--text-soft);
+  text-anchor: middle;
+}
+
+/* ============================================================
+   SCENE 4 — world model node graph
+   ============================================================ */
+.worldmodel-viz {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 0 auto;
+  min-height: 0;
+}
+
+/* ============================================================
+   SCENE 4 — system of equations
+   ============================================================ */
+.equations-viz {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 28px;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  min-height: 0;
+  padding: 8px 16px;
+}
+.eq-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.eq-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  align-items: center;
+  gap: 28px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--paper-line);
+}
+.eq-row:last-child { border-bottom: none; }
+.eq-label {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.eq-math {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 18px;
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+.eq-math sub, .eq-math sup { font-size: 0.7em; }
+.eq-op { color: var(--text-muted); font-weight: 600; }
+.eq-term { font-weight: 500; }
+.eq-frac {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.05;
+  margin: 0 2px;
+}
+.eq-frac .eq-num {
+  border-bottom: 1.5px solid var(--text);
+  padding: 0 8px 2px;
+}
+.eq-frac .eq-den {
+  padding: 2px 8px 0;
+}
+.eq-footer {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--text-soft);
+  text-align: center;
+  margin: 8px 0 0;
+}
+
+/* Scene 4 choreography: each equation row fades in with a stagger */
+.choreo-eq {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.6s cubic-bezier(.22, .61, .36, 1),
+    transform 0.6s cubic-bezier(.22, .61, .36, 1);
+}
+.narrative-scene.shown.choreo-play .choreo-eq { opacity: 1; transform: none; }
+.narrative-scene.shown.choreo-play .choreo-eq[data-eq="0"] { transition-delay: 0.15s; }
+.narrative-scene.shown.choreo-play .choreo-eq[data-eq="1"] { transition-delay: 0.55s; }
+.narrative-scene.shown.choreo-play .choreo-eq[data-eq="2"] { transition-delay: 0.95s; }
+.narrative-scene.shown.choreo-play .choreo-eq[data-eq="3"] { transition-delay: 1.35s; }
+.narrative-scene.shown.choreo-play .choreo-eq[data-eq="4"] { transition-delay: 1.95s; }
+.wm-svg {
+  width: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+}
+/* Organs */
+.wm-organ circle {
+  fill: var(--paper);
+  stroke: var(--text);
+  stroke-width: 1.8;
+}
+.wm-organ-plasma circle {
+  fill: rgba(185, 78, 42, 0.10);
+  stroke: var(--rust);
+  stroke-width: 2.2;
+}
+.wm-organ-label {
+  font-family: var(--mono);
+  font-size: 13px;
+  fill: var(--text);
+  text-anchor: middle;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  dominant-baseline: middle;
+}
+.wm-label-plasma { fill: var(--rust); font-size: 15px; }
+.wm-organ-param {
+  font-family: var(--mono);
+  font-size: 12px;
+  fill: var(--text-muted);
+  text-anchor: middle;
+  letter-spacing: 0.03em;
+}
+
+/* Flow paths between plasma and organs */
+.wm-flow {
+  fill: none;
+  stroke: var(--rust);
+  stroke-width: 1.5;
+  opacity: 0;
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+  transition:
+    opacity 0.4s ease,
+    stroke-dashoffset 0.7s cubic-bezier(.4, 0, .2, 1);
+}
+
+/* Drug particles (the pulse riding the bloodstream) */
+.wm-particle {
+  fill: var(--rust);
+  opacity: 0;
+  visibility: hidden;
+}
+.narrative-scene.shown.choreo-play .wm-particle { visibility: visible; }
+
+/* ============ choreography ============ */
+
+/* All non-plasma organs start invisible and scale up */
+.wm-organ-gut,
+.wm-organ-liver,
+.wm-organ-tissue,
+.wm-organ-kidney {
+  opacity: 0;
+  transform-origin: center;
+  transform: scale(0.6);
+  transition:
+    opacity 0.5s ease,
+    transform 0.6s cubic-bezier(.34, 1.56, .64, 1);
+}
+.wm-organ-plasma {
+  opacity: 0;
+  transform-origin: 360px 220px;
+  transform: scale(0.3);
+  transition:
+    opacity 0.6s ease,
+    transform 0.7s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+/* Parameter labels fade in last */
+.wm-organ-param {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+/* ============ play sequence ============ */
+
+/* 1. Plasma appears first (0s) */
+.narrative-scene.shown.choreo-play .wm-organ-plasma {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* 2. Organs cascade in (0.4s start, staggered) */
+.narrative-scene.shown.choreo-play .wm-organ-gut    { opacity: 1; transform: scale(1); transition-delay: 0.40s, 0.40s; }
+.narrative-scene.shown.choreo-play .wm-organ-liver  { opacity: 1; transform: scale(1); transition-delay: 0.55s, 0.55s; }
+.narrative-scene.shown.choreo-play .wm-organ-tissue { opacity: 1; transform: scale(1); transition-delay: 0.70s, 0.70s; }
+.narrative-scene.shown.choreo-play .wm-organ-kidney { opacity: 1; transform: scale(1); transition-delay: 0.85s, 0.85s; }
+
+/* 3. Flow paths draw in (1.1s start, staggered) */
+.narrative-scene.shown.choreo-play .wm-flow-gut    { opacity: 0.65; stroke-dashoffset: 0; transition-delay: 1.10s, 1.10s; }
+.narrative-scene.shown.choreo-play .wm-flow-liver  { opacity: 0.65; stroke-dashoffset: 0; transition-delay: 1.20s, 1.20s; }
+.narrative-scene.shown.choreo-play .wm-flow-tissue { opacity: 0.65; stroke-dashoffset: 0; transition-delay: 1.30s, 1.30s; }
+.narrative-scene.shown.choreo-play .wm-flow-kidney { opacity: 0.65; stroke-dashoffset: 0; transition-delay: 1.40s, 1.40s; }
+
+/* 4. One-shot particle: drug travels from plasma OUT to each organ (1.7s start) */
+.narrative-scene.shown.choreo-play .wm-particle-gut    { animation: wm-pulse-gut    2.4s cubic-bezier(.4, 0, .6, 1) 1.70s 1, wm-pulse-loop-gut    3.2s linear 4.10s infinite; }
+.narrative-scene.shown.choreo-play .wm-particle-liver  { animation: wm-pulse-liver  2.4s cubic-bezier(.4, 0, .6, 1) 1.85s 1, wm-pulse-loop-liver  3.2s linear 4.25s infinite; }
+.narrative-scene.shown.choreo-play .wm-particle-tissue { animation: wm-pulse-tissue 2.4s cubic-bezier(.4, 0, .6, 1) 2.00s 1, wm-pulse-loop-tissue 3.2s linear 4.40s infinite; }
+.narrative-scene.shown.choreo-play .wm-particle-kidney { animation: wm-pulse-kidney 2.4s cubic-bezier(.4, 0, .6, 1) 2.15s 1, wm-pulse-loop-kidney 3.2s linear 4.55s infinite; }
+
+/* 5. Parameter labels fade in (after one-shot, ~3.5s) */
+.narrative-scene.shown.choreo-play .wm-organ-param { opacity: 1; transition-delay: 3.50s; }
+
+/* Particle motion: one-shot — drug starts at plasma center, travels to organ.
+   Plasma center = (360, 220). */
+@keyframes wm-pulse-gut {
+  0%   { cx: 360; cy: 220; opacity: 0; }
+  10%  { cx: 360; cy: 220; opacity: 1; }
+  90%  { cx: 160; cy: 220; opacity: 1; }
+  100% { cx: 160; cy: 220; opacity: 0; }
+}
+@keyframes wm-pulse-liver {
+  0%   { cx: 360; cy: 220; opacity: 0; }
+  10%  { cx: 360; cy: 220; opacity: 1; }
+  90%  { cx: 560; cy: 220; opacity: 1; }
+  100% { cx: 560; cy: 220; opacity: 0; }
+}
+@keyframes wm-pulse-tissue {
+  0%   { cx: 360; cy: 220; opacity: 0; }
+  10%  { cx: 360; cy: 220; opacity: 1; }
+  90%  { cx: 360; cy: 80;  opacity: 1; }
+  100% { cx: 360; cy: 80;  opacity: 0; }
+}
+@keyframes wm-pulse-kidney {
+  0%   { cx: 360; cy: 220; opacity: 0; }
+  10%  { cx: 360; cy: 220; opacity: 1; }
+  90%  { cx: 360; cy: 360; opacity: 1; }
+  100% { cx: 360; cy: 360; opacity: 0; }
+}
+
+/* Continuous ambient pulse loop: smaller, gentler, repeats. */
+@keyframes wm-pulse-loop-gut {
+  0%, 100% { cx: 360; cy: 220; opacity: 0; }
+  10%      { opacity: 0.7; }
+  50%      { cx: 260; cy: 220; opacity: 0.6; }
+  90%      { cx: 160; cy: 220; opacity: 0; }
+}
+@keyframes wm-pulse-loop-liver {
+  0%, 100% { cx: 360; cy: 220; opacity: 0; }
+  10%      { opacity: 0.7; }
+  50%      { cx: 460; cy: 220; opacity: 0.6; }
+  90%      { cx: 560; cy: 220; opacity: 0; }
+}
+@keyframes wm-pulse-loop-tissue {
+  0%, 100% { cx: 360; cy: 220; opacity: 0; }
+  10%      { opacity: 0.7; }
+  50%      { cx: 360; cy: 150; opacity: 0.6; }
+  90%      { cx: 360; cy: 80;  opacity: 0; }
+}
+@keyframes wm-pulse-loop-kidney {
+  0%, 100% { cx: 360; cy: 220; opacity: 0; }
+  10%      { opacity: 0.7; }
+  50%      { cx: 360; cy: 290; opacity: 0.6; }
+  90%      { cx: 360; cy: 360; opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wm-particle { animation: none !important; opacity: 0 !important; }
+}
+
+/* ============================================================
+   SCENE 5 — derivation / rejection
+   ============================================================ */
+.derive-viz {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  padding: 4px 8px;
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto;
+  min-height: 0;
+}
+.dv-row {
+  display: grid;
+  grid-template-columns: 72px 120px 1fr;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 20px;
+  background: var(--paper-2);
+  border: 1px solid var(--paper-line);
+  border-radius: 8px;
+}
+.dv-key {
+  font-family: var(--mono);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--text);
+}
+.dv-key sub {
+  font-size: 0.7em;
+}
+.dv-val {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text);
+}
+.dv-val-strike {
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+  color: var(--crimson);
+  opacity: 0.85;
+}
+.dv-val-good { color: var(--olive); }
+.dv-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+.dv-row-locked {
+  border-left: 3px solid var(--text);
+}
+.dv-row-rejected {
+  border-left: 3px solid var(--crimson);
+  background: rgba(176, 56, 38, 0.04);
+}
+.dv-tag-rejected { color: var(--crimson); }
+.dv-row-derived {
+  border-left: 3px solid var(--olive);
+  background: rgba(124, 138, 61, 0.06);
+}
+.dv-tag-derived { color: var(--olive); }
+.dv-constraint {
+  font-family: var(--mono);
+  font-size: 13.5px;
+  color: var(--text-soft);
+  text-align: center;
+  padding: 6px 0;
+  letter-spacing: 0.02em;
+}
+.dv-constraint sub { font-size: 0.7em; }
+.dv-constraint-label {
+  display: block;
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.dv-arrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+  letter-spacing: 0.04em;
+  padding: 2px 0;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 980px) {
+  .hero-narrative { padding: 48px 0 56px; }
+  .narrative-stack { gap: 28px; }
+  .scene-headlines {
+    min-height: 0;
+  }
+  .scene-headline {
+    position: relative;
+    inset: auto;
+    display: none;
+  }
+  .scene-headline.shown { display: block; }
+  .stage-frame { aspect-ratio: 4 / 3; }
 }
 
 /* ============================================================
@@ -384,9 +2449,9 @@ p:last-child { margin-bottom: 0; }
   margin-bottom: 16px;
 }
 .section h2 {
-  font-size: clamp(32px, 4.4vw, 50px);
-  line-height: 1.08;
-  letter-spacing: -0.02em;
+  font-size: clamp(30px, 4.2vw, 46px);
+  line-height: 1.14;
+  letter-spacing: -0.008em;
   margin: 0;
   max-width: 880px;
 }
@@ -539,8 +2604,8 @@ p:last-child { margin-bottom: 0; }
   border-bottom: 1px solid var(--paper-line);
 }
 .closer h2 {
-  font-size: clamp(38px, 5.5vw, 64px);
-  line-height: 1.02;
+  font-size: clamp(36px, 5.2vw, 58px);
+  line-height: 1.12;
   margin: 0 auto 24px;
   max-width: 760px;
 }
@@ -567,6 +2632,15 @@ p:last-child { margin-bottom: 0; }
   grid-template-columns: 1fr 1fr 1fr;
   align-items: center;
   gap: 24px;
+}
+.footer-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.footer-mark {
+  width: 22px;
+  height: 22px;
 }
 .footer-mid {
   text-align: center;
@@ -597,6 +2671,7 @@ p:last-child { margin-bottom: 0; }
   .capability-grid { grid-template-columns: 1fr; }
   .why-grid { grid-template-columns: 1fr; }
   .footer-inner { grid-template-columns: 1fr; text-align: center; }
+  .footer-left { justify-content: center; }
   .footer-right { text-align: center; }
   .section { padding: 80px 0; }
   .stage-frame { aspect-ratio: 1 / 1.1; }
