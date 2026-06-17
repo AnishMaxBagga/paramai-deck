@@ -243,6 +243,14 @@
           e.preventDefault();
           current++;
           showScene(current);
+        } else {
+          // Already on the last Hero 1 scene — pressing right hands off to the engine demo.
+          e.preventDefault();
+          const engineSection = document.getElementById('engine');
+          if (engineSection) engineSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          setTimeout(() => {
+            if (typeof window.runEngineDemo === 'function') window.runEngineDemo();
+          }, 700);
         }
       } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
         if (current > 0) {
@@ -533,6 +541,8 @@
     // by playHero2Curves() — called from the engine demo's runAll() after act 4 completes.
     // (Falls back to IntersectionObserver at high threshold if the demo isn't run.)
     [curveGood, curveNaive, obsLine].forEach(el => el && el.classList.remove('drawn'));
+    const legendBlocks = hero2.querySelectorAll('.cv-legend-block');
+    legendBlocks.forEach(b => b.classList.remove('shown'));
     hero2.classList.add('d2-curves-pending');
 
     // Expose a trigger that the engine demo can call.
@@ -540,13 +550,30 @@
       if (hero2.dataset.played === 'true') return;
       hero2.dataset.played = 'true';
       hero2.classList.remove('d2-curves-pending');
-      setTimeout(() => curveGood  && curveGood.classList.add('drawn'),  100);
-      setTimeout(() => curveNaive && curveNaive.classList.add('drawn'), 700);
-      setTimeout(() => obsLine    && obsLine.classList.add('drawn'),   1700);
+
+      const legendGood  = hero2.querySelector('#d2-legend-good');
+      const legendNaive = hero2.querySelector('#d2-legend-naive');
+      const legendObs   = hero2.querySelector('#d2-legend-obs');
+      const legendRatio = hero2.querySelector('#d2-legend-ratio');
+
+      // Curves draw in sequence (CSS transition is 2.2s).
+      // Legend blocks fade in as their matching curve nears completion.
+      setTimeout(() => curveGood  && curveGood.classList.add('drawn'),   100);
+      setTimeout(() => legendGood && legendGood.classList.add('shown'), 1900);
+
+      setTimeout(() => curveNaive  && curveNaive.classList.add('drawn'),  700);
+      setTimeout(() => legendNaive && legendNaive.classList.add('shown'), 2500);
+
+      setTimeout(() => obsLine   && obsLine.classList.add('drawn'),    1700);
+      setTimeout(() => legendObs && legendObs.classList.add('shown'),  2200);
+
       const dots = hero2.querySelectorAll('.cv-observed-dot');
       dots.forEach((d, i) => {
         setTimeout(() => d.classList.add('drawn'), 1900 + i * 90);
       });
+
+      // Ratio line lands last, after everything else
+      setTimeout(() => legendRatio && legendRatio.classList.add('shown'), 3100);
     };
 
     // Fallback: if the user scrolls into Hero 2 without running the demo first

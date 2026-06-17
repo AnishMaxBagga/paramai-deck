@@ -98,143 +98,169 @@ const auditEntries = [
   { tag: "READY",      msg: "Model state: physiologically consistent, simulation-ready" },
 ];
 
-/* ---------- ACT 2 animation ---------- */
+/* ---------- ACT 2 animation: highlight in paper, fly value to list, circle missing ---------- */
 async function runExtraction() {
-  const list = document.getElementById("extract-list");
-  const missingList = document.getElementById("missing-list");
-  const counter = document.getElementById("extract-counter");
-  const status = document.getElementById("missing-status");
+  const stage = document.getElementById("ext-stage");
+  const list = document.getElementById("ext-list");
+  const missingList = document.getElementById("ext-missing-list");
+  const counter = document.getElementById("ext-list-count");
+  const flyLayer = document.getElementById("ext-fly-layer");
+  if (!stage || !list || !flyLayer) return;
+
+  // Reset any prior run
   list.innerHTML = "";
   missingList.innerHTML = "";
+  flyLayer.innerHTML = "";
+  stage.querySelectorAll(".ext-mark").forEach(m => m.classList.remove("ext-mark-pulse", "ext-mark-done"));
+  stage.querySelectorAll(".ext-missing").forEach(m => m.classList.remove("show"));
 
-  status.textContent = "scanning paper…";
+  const marks = Array.from(stage.querySelectorAll(".ext-mark"));
+  const stageRect = stage.getBoundingClientRect();
+  counter.textContent = `0 of ${marks.length}`;
 
-  for (let i = 0; i < extractedParams.length; i++) {
-    const p = extractedParams[i];
-    const el = document.createElement("div");
-    el.className = "extract-row";
-    el.style.animationDelay = "0ms";
-    el.innerHTML = `
-      <span class="er-name">${p.name}</span>
-      <span class="er-val">${p.value}</span>
-      <span class="er-src">${p.source}</span>
-    `;
-    list.appendChild(el);
-    counter.textContent = `${i + 1} found · 0 flagged`;
-    await sleep(150);
+  // For each mark: pulse → spawn a flying chip → animate to a placeholder row in the list
+  for (let i = 0; i < marks.length; i++) {
+    const mark = marks[i];
+    const key = mark.dataset.pk;
+    const val = mark.dataset.pv;
+
+    // Pulse the mark
+    mark.classList.add("ext-mark-pulse");
+    await sleep(130);
+
+    // Create a placeholder list row (empty value, fades in as the chip lands)
+    const row = document.createElement("div");
+    row.className = "ext-row";
+    row.style.animationDelay = "0ms";
+    row.style.opacity = "0";
+    row.innerHTML = `<span class="er-k">${key}</span><span class="er-v">${val}</span>`;
+    list.appendChild(row);
+    // Force layout so we can measure where the row lives
+    void row.getBoundingClientRect();
+    const rowRect = row.getBoundingClientRect();
+
+    // Spawn a fly chip at the mark's position
+    const markRect = mark.getBoundingClientRect();
+    const chip = document.createElement("span");
+    chip.className = "ext-fly";
+    chip.textContent = `${key} = ${val}`;
+    chip.style.left = (markRect.left - stageRect.left) + "px";
+    chip.style.top  = (markRect.top  - stageRect.top ) + "px";
+    flyLayer.appendChild(chip);
+
+    // Force layout, then translate to row's position
+    void chip.getBoundingClientRect();
+    const dx = (rowRect.left - stageRect.left) - (markRect.left - stageRect.left);
+    const dy = (rowRect.top  - stageRect.top ) - (markRect.top  - stageRect.top );
+    chip.style.transform = `translate(${dx.toFixed(0)}px, ${dy.toFixed(0)}px) scale(0.9)`;
+
+    // Mid-flight: settle the row in
+    setTimeout(() => { row.style.opacity = "1"; row.style.transform = "none"; }, 220);
+    // After landing: fade the chip, mark the source as "done"
+    setTimeout(() => { chip.style.opacity = "0"; }, 380);
+    setTimeout(() => { mark.classList.remove("ext-mark-pulse"); mark.classList.add("ext-mark-done"); chip.remove(); }, 480);
+
+    counter.textContent = `${i + 1} of ${marks.length}`;
+    await sleep(160);
   }
 
   await sleep(300);
-  status.textContent = "comparing against model requirements…";
-  await sleep(500);
 
-  for (let i = 0; i < missingParams.length; i++) {
-    const m = missingParams[i];
-    const el = document.createElement("div");
-    el.className = "missing-row";
-    el.dataset.key = m.key;
-    el.innerHTML = `
-      <span class="mr-name">${m.name}</span>
-      <span class="mr-desc">${m.desc}</span>
-      <span class="mr-status">missing</span>
-    `;
-    missingList.appendChild(el);
-    counter.textContent = `${extractedParams.length} found · ${i + 1} flagged`;
-    await sleep(220);
-  }
+  // Now reveal missing parameter callouts
+  const missing = stage.querySelector("#ext-miss-1");
+  if (missing) missing.classList.add("show");
 
-  status.textContent = "4 parameters required — handing off to validator";
-  showFlowArrow("flow-2-3");
+  // And add a row to the missing-list panel
+  const missingRow = document.createElement("div");
+  missingRow.className = "ext-row";
+  missingRow.style.animationDelay = "0ms";
+  missingRow.innerHTML = `<span class="er-k">CL_int</span><span class="er-v">not reported</span>`;
+  missingList.appendChild(missingRow);
+
+  await sleep(450);
 }
 
-/* ---------- ACT 4 animation: verifying — all rows pass with derived values ---------- */
+/* ---------- ACT 4 animation: assemble model from chips, then hand off ---------- */
 async function runBalanceCheck() {
-  const rows = ["qh", "clh", "eh", "impl"];
-  for (let i = 0; i < rows.length; i++) {
-    const row = document.querySelector(`.brow[data-row="${rows[i]}"]`);
-    if (!row) continue;
-    row.classList.add("checking");
-    await sleep(380);
-    row.classList.remove("checking");
-    row.classList.add("ok");
-    await sleep(140);
+  const chips = document.querySelectorAll(".pp-chip");
+  const model = document.getElementById("pred-model");
+  const status = document.getElementById("pred-model-status");
+
+  // Reset
+  chips.forEach(c => c.classList.remove("shown", "converging"));
+  if (model) model.classList.remove("shown", "pulse");
+  if (status) status.textContent = "assembling…";
+
+  // Cascade chips in
+  for (let i = 0; i < chips.length; i++) {
+    chips[i].classList.add("shown");
+    await sleep(55);
   }
+  await sleep(220);
+
+  // Converge: chips fade as the model box materializes
+  chips.forEach(c => c.classList.add("converging"));
+  if (model) model.classList.add("shown");
+  await sleep(380);
+  if (model) model.classList.add("pulse");
+  if (status) status.textContent = "ready";
+  await sleep(450);
 }
 
 /* ---------- ACT 4 animation ---------- */
 async function runDerivation() {
   const auditEl = document.getElementById("audit-stream");
-  auditEl.innerHTML = "";
-  const startT = performance.now();
+  if (auditEl) auditEl.innerHTML = "";
 
-  // first 6 audit entries (setup + lock)
-  for (let i = 0; i < 6; i++) {
-    addAuditLine(auditEntries[i], startT);
-    await sleep(280);
+  // New simplified derivation: three locked inputs slide in, solver appears,
+  // substitution fills in, the answer chip lands.
+  const inputs = document.querySelectorAll(".der-input");
+  const solver = document.getElementById("der-solver");
+  const sub    = document.getElementById("der-substitution");
+  const answer = document.getElementById("der-answer");
+  const answerVal = document.getElementById("der-answer-val");
+
+  // Reset
+  inputs.forEach(i => i.classList.remove("shown"));
+  if (solver) solver.classList.remove("shown");
+  if (sub) { sub.classList.remove("shown"); sub.textContent = ""; }
+  if (answer) answer.classList.remove("shown");
+  if (answerVal) answerVal.textContent = "—";
+
+  // Reveal locked inputs in sequence
+  for (let i = 0; i < inputs.length; i++) {
+    inputs[i].classList.add("shown");
+    await sleep(160);
   }
+  await sleep(200);
 
-  // animate substitution
-  const sub = document.getElementById("solve-substitution");
-  sub.textContent = "CL_int = (90 × 26.6) / (0.09 × (90 − 26.6))";
-  sub.classList.add("show");
-  await sleep(700);
+  // Reveal the solver equation
+  if (solver) solver.classList.add("shown");
+  await sleep(380);
 
-  // SOLVE entries
-  for (let i = 6; i < 9; i++) {
-    addAuditLine(auditEntries[i], startT);
-    await sleep(260);
+  // Substitution text fills in
+  if (sub) {
+    sub.textContent = "= (90 × 26.6) / (0.09 × (90 − 26.6))";
+    sub.classList.add("shown");
   }
+  await sleep(500);
 
-  // animate counter
-  const resultEl = document.getElementById("solve-result-value");
+  // Tween the answer value from 0 to 419.2
+  if (answer) answer.classList.add("shown");
   const target = 419.2;
-  for (let i = 0; i <= 28; i++) {
-    const v = (target * (i / 28));
-    resultEl.textContent = `CL_int = ${v.toFixed(1)} L/h`;
-    await sleep(28);
+  const frames = 24;
+  for (let i = 0; i <= frames; i++) {
+    const v = target * (1 - Math.pow(1 - i / frames, 3));
+    if (answerVal) answerVal.textContent = v.toFixed(1);
+    await sleep(20);
   }
 
-  await sleep(300);
-
-  // populate recovered
-  const recovered = document.getElementById("recovered");
-  recovered.classList.add("show");
-  const recValues = {
-    clint: "419.2 L/h",
-    eh: "0.296",
-    ke: "0.020 1/h",
-    tp: "3.12",
-  };
-  // also resolve the missing-row badges from Act 2 (visually 'wired through')
-  const missingMap = {
-    clint: "clint",
-    eh: "eh",
-    ke: "ke",
-    tp: "tp",
-  };
-  for (const key of Object.keys(recValues)) {
-    const item = document.querySelector(`.rec-item[data-rec="${key}"]`);
-    item.querySelector(".rec-val").textContent = recValues[key];
-    item.classList.add("show");
-    // mirror back to Act 2's missing-row
-    const m = document.querySelector(`.missing-row[data-key="${missingMap[key]}"]`);
-    if (m) {
-      m.classList.add("resolved");
-      m.querySelector(".mr-status").textContent = "derived";
-    }
-    await sleep(280);
-  }
-
-  // remaining audit (derivations + balance + ready)
-  for (let i = 9; i < auditEntries.length; i++) {
-    addAuditLine(auditEntries[i], startT);
-    await sleep(240);
-  }
-  showFlowArrow("flow-4-5");
+  await sleep(400);
 }
 
 function addAuditLine(entry, startT) {
   const auditEl = document.getElementById("audit-stream");
+  if (!auditEl) return;
   const t = ((performance.now() - startT) / 1000).toFixed(2);
   const div = document.createElement("div");
   div.className = "audit-line";
@@ -426,28 +452,48 @@ async function runAll() {
   runBtn.disabled = true;
   runLabel.textContent = "Running…";
 
-  // Act 1 — just reveal
+  // Act 1 — source: show drug + model, then a literature search picks the source paper.
   setActiveAct(1, { scroll: true });
-  await sleep(800);
+  const srcStage = document.querySelector(".src-stage");
+  if (srcStage) {
+    srcStage.classList.remove("show-paper");
+    srcStage.querySelectorAll(".src-search-row").forEach(r => r.classList.remove("shown", "picked", "dimmed"));
+  }
+  await sleep(1100);
+  if (srcStage) srcStage.classList.add("show-paper");
+
+  // Cascade the search rows in
+  const rows = srcStage ? srcStage.querySelectorAll(".src-search-row") : [];
+  for (let i = 0; i < rows.length; i++) {
+    rows[i].classList.add("shown");
+    await sleep(70);
+  }
+  await sleep(280);
+
+  // Pick the Swaisland row (data-srow="2"), dim the others
+  const picked = srcStage && srcStage.querySelector('.src-search-row[data-srow="2"]');
+  rows.forEach(r => { if (r !== picked) r.classList.add("dimmed"); });
+  if (picked) picked.classList.add("picked");
+  await sleep(700);
   showFlowArrow("flow-1-2");
 
   // Act 2 — extraction
   setActiveAct(2, { scroll: true });
-  await sleep(600);
+  await sleep(300);
   await runExtraction();
-  await sleep(700);
+  await sleep(300);
 
-  // Act 3 — solving (inverse-derive missing parameters)
+  // Act 3 — derivation
   setActiveAct(3, { scroll: true });
-  await sleep(600);
+  await sleep(300);
   await runDerivation();
-  await sleep(900);
+  await sleep(400);
 
-  // Act 4 — verifying (confirm the derived set is mass-balance consistent)
+  // Act 4 — model assembly + handoff
   setActiveAct(4, { scroll: true });
-  await sleep(600);
+  await sleep(300);
   await runBalanceCheck();
-  await sleep(900);
+  await sleep(400);
 
   // mark complete
   epFill.style.width = "100%";
@@ -488,7 +534,8 @@ function reset() {
   document.getElementById("solve-substitution").classList.remove("show");
   document.getElementById("solve-substitution").textContent = "";
   document.getElementById("solve-result-value").textContent = "awaiting input…";
-  document.getElementById("audit-stream").innerHTML = "";
+  const resetAudit = document.getElementById("audit-stream");
+  if (resetAudit) resetAudit.innerHTML = "";
   document.getElementById("recovered").classList.remove("show");
   document.querySelectorAll(".rec-item").forEach(i => {
     i.classList.remove("show");
@@ -503,6 +550,12 @@ function reset() {
 }
 
 runBtn.addEventListener("click", runAll);
+
+// Expose runAll so Hero 1's right-arrow-on-last-scene can trigger the demo.
+window.runEngineDemo = function () {
+  if (typeof isRunning !== "undefined" && isRunning) return;
+  runAll();
+};
 resetBtn.addEventListener("click", reset);
 
 // "See it run on a real drug" CTA in Hero 1: scroll to engine + auto-start the run.

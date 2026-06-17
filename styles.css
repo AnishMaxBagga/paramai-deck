@@ -848,7 +848,7 @@ p:last-child { margin-bottom: 0; }
 .curve-svg-deck2 {
   width: 100%;
   height: auto;
-  max-height: 100%;
+  max-height: none;
 }
 
 /* ============================================================
@@ -1050,85 +1050,96 @@ p:last-child { margin-bottom: 0; }
 .narrative-scene.shown.choreo-play .choreo-m[data-m="2"] { opacity: 1; transform: none; transition-delay: 0.90s; }
 
 /* ============================================================
-   VALUE TO PHARMA — measured rows
+   VALUE TO PHARMA — three-beat narration
    ============================================================ */
 .value-viz {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  gap: 36px;
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
   min-height: 0;
-  padding: 0 16px;
+  padding: 0 24px;
 }
-.value-table {
+.value-beat {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  gap: 8px;
+  padding-left: 22px;
+  border-left: 4px solid var(--rust);
 }
-.value-thead,
-.value-row {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr;
-  align-items: center;
-  gap: 28px;
-  padding: 18px 8px;
-}
-.value-thead {
-  border-bottom: 2px solid var(--text);
-  padding-bottom: 12px;
-}
-.value-row {
-  border-bottom: 1px solid var(--paper-line);
-}
-.value-row:last-child { border-bottom: none; }
-
-.value-th {
+.value-beat-eyebrow {
   font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--rust);
 }
-.value-th-before { text-align: center; color: var(--text-muted); }
-.value-th-after  { text-align: center; color: var(--rust); }
-
-.value-row-label {
+.value-beat-headline {
   font-family: var(--serif);
-  font-size: 21px;
-  color: var(--text);
+  font-size: clamp(28px, 2.8vw, 42px);
   font-weight: 500;
-  letter-spacing: -0.005em;
-  line-height: 1.25;
+  color: var(--text);
+  letter-spacing: -0.012em;
+  line-height: 1.15;
 }
-.value-row-before {
+.vb-before {
   font-family: var(--mono);
-  font-size: 16px;
-  color: var(--text-soft);
-  text-align: center;
+  color: var(--text-muted);
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+  font-weight: 500;
 }
-.value-row-after {
+.vb-arrow {
+  color: var(--text-muted);
   font-family: var(--mono);
-  font-size: 18px;
+  margin: 0 6px;
+}
+.vb-after {
   color: var(--rust);
   font-weight: 600;
-  text-align: center;
+  font-family: var(--mono);
 }
+.value-beat-sub {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(16px, 1.3vw, 19px);
+  color: var(--text-soft);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+.value-beat-math {
+  font-family: var(--mono);
+  font-size: clamp(13px, 1.05vw, 16px);
+  color: var(--text);
+  margin-top: 8px;
+  letter-spacing: 0.01em;
+  line-height: 1.45;
+}
+.value-beat-cite {
+  font-family: var(--mono);
+  font-size: clamp(10px, 0.85vw, 12px);
+  color: var(--text-muted);
+  margin-top: 4px;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+}
+
+/* Choreography: beats fade in one by one */
 .choreo-v {
   opacity: 0;
-  transform: translateX(-6px);
+  transform: translateX(-8px);
   transition:
-    opacity 0.5s cubic-bezier(.22, .61, .36, 1),
-    transform 0.5s cubic-bezier(.22, .61, .36, 1);
+    opacity 0.6s cubic-bezier(.22, .61, .36, 1),
+    transform 0.6s cubic-bezier(.22, .61, .36, 1);
 }
-.narrative-scene.shown.choreo-play .choreo-v[data-v="0"] { opacity: 1; transform: none; transition-delay: 0.10s; }
-.narrative-scene.shown.choreo-play .choreo-v[data-v="1"] { opacity: 1; transform: none; transition-delay: 0.28s; }
-.narrative-scene.shown.choreo-play .choreo-v[data-v="2"] { opacity: 1; transform: none; transition-delay: 0.46s; }
-.narrative-scene.shown.choreo-play .choreo-v[data-v="3"] { opacity: 1; transform: none; transition-delay: 0.64s; }
-.narrative-scene.shown.choreo-play .choreo-v[data-v="4"] { opacity: 1; transform: none; transition-delay: 0.82s; }
+.narrative-scene.shown.choreo-play .choreo-v[data-v="0"] { opacity: 1; transform: none; transition-delay: 0.15s; }
+.narrative-scene.shown.choreo-play .choreo-v[data-v="1"] { opacity: 1; transform: none; transition-delay: 0.50s; }
+.narrative-scene.shown.choreo-play .choreo-v[data-v="2"] { opacity: 1; transform: none; transition-delay: 0.85s; }
 
 /* ============================================================
    CONCLUSION SCENE — wordmark, pitch, headshot, QR
@@ -1177,11 +1188,11 @@ p:last-child { margin-bottom: 0; }
 }
 .closer-pitch {
   font-family: var(--serif);
-  font-size: clamp(17px, 1.5vw, 22px);
-  line-height: 1.45;
+  font-size: clamp(20px, 1.85vw, 27px);
+  line-height: 1.42;
   color: var(--text);
   margin: 0;
-  max-width: 640px;
+  max-width: 680px;
   letter-spacing: -0.003em;
 }
 .closer-pitch em {
@@ -1204,11 +1215,11 @@ p:last-child { margin-bottom: 0; }
 }
 .closer-email:hover { opacity: 0.7; }
 .closer-headshot {
-  width: clamp(140px, 16vw, 220px);
-  height: clamp(140px, 16vw, 220px);
+  width: clamp(200px, 22vw, 300px);
+  height: clamp(200px, 22vw, 300px);
   border-radius: 50%;
   object-fit: cover;
-  object-position: 50% 25%;
+  object-position: 50% 12%;
   box-shadow: 0 8px 22px -10px rgba(14, 17, 22, 0.30);
   border: 2px solid var(--paper);
 }
@@ -1219,8 +1230,8 @@ p:last-child { margin-bottom: 0; }
   gap: 6px;
 }
 .closer-qr {
-  width: clamp(130px, 14vw, 180px);
-  height: clamp(130px, 14vw, 180px);
+  width: clamp(180px, 19vw, 250px);
+  height: clamp(180px, 19vw, 250px);
   border-radius: 6px;
   background: var(--paper);
   display: block;
@@ -1325,7 +1336,23 @@ p:last-child { margin-bottom: 0; }
 .cv-auc-naive { fill: var(--crimson); }
 .cv-auc-good  { fill: var(--olive); }
 
-/* Right-edge legend block */
+/* Chart title (above axes) */
+.cv-title {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  fill: var(--text);
+  font-weight: 600;
+}
+
+/* Right-edge legend block — each block fades in via JS in sync with its curve */
+.cv-legend-block {
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.5s cubic-bezier(.22,.61,.36,1), transform 0.5s cubic-bezier(.22,.61,.36,1);
+}
+.cv-legend-block.shown { opacity: 1; transform: none; }
 .cv-legend-swatch { stroke-width: 3; stroke-linecap: round; }
 .cv-legend-swatch-good  { stroke: var(--olive); }
 .cv-legend-swatch-naive { stroke: var(--crimson); }
@@ -1544,15 +1571,15 @@ p:last-child { margin-bottom: 0; }
   height: 220;
 }
 .narrative-scene.shown.choreo-play .funnel-bar-2 rect {
-  y: 132;  height: 138;
+  y: 156;  height: 114;
   transition-delay: 0.40s, 0.40s, 0s, 0s;
 }
 .narrative-scene.shown.choreo-play .funnel-bar-3 rect {
-  y: 202;  height: 68;
+  y: 239;  height: 31;
   transition-delay: 0.80s, 0.80s, 0s, 0s;
 }
 .narrative-scene.shown.choreo-play .funnel-bar-4 rect {
-  y: 244;  height: 26;
+  y: 252;  height: 18;
   transition-delay: 1.20s, 1.20s, 0s, 0s;
 }
 
@@ -1676,8 +1703,8 @@ p:last-child { margin-bottom: 0; }
 }
 .bb-stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 22px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
   width: 100%;
   padding: 0 8px;
   flex-shrink: 0;
@@ -2676,3 +2703,165 @@ p:last-child { margin-bottom: 0; }
   .section { padding: 80px 0; }
   .stage-frame { aspect-ratio: 1 / 1.1; }
 }
+
+/* ============================================================
+   SCENE 2 (Hero 1) — Why now: zigzag timeline
+   ============================================================ */
+.why-now-viz {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 56px;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  min-height: 0;
+  padding: 0 24px;
+}
+
+/* The timeline container holds the track and three absolutely-positioned milestone cards */
+.wn-timeline {
+  position: relative;
+  width: 100%;
+  height: 460px;
+  display: flex;
+  align-items: center;
+}
+.wn-track {
+  position: absolute;
+  top: 50%;
+  left: 4%;
+  right: 4%;
+  height: 2px;
+  background: var(--rust);
+  opacity: 0.4;
+  transform: translateY(-1px);
+}
+
+/* Each milestone: dot + card stacked. The dot sits on the track at center. */
+.wn-milestone {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 30%;
+  max-width: 380px;
+}
+.wn-pos-1 { left: 3%; }
+.wn-pos-2 { left: 50%; margin-left: -15%; }
+.wn-pos-3 { right: 3%; }
+
+/* Cards below the track: dot at top of card position, card below it */
+.wn-pos-below { top: 50%; }
+.wn-pos-below .wn-dot { margin-bottom: 14px; }
+.wn-pos-below .wn-card { order: 2; }
+
+/* Cards above the track: card on top, dot at bottom (sitting on the track) */
+.wn-pos-above { bottom: 50%; flex-direction: column-reverse; }
+.wn-pos-above .wn-dot { margin-top: 14px; }
+
+/* The dot on the track */
+.wn-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--rust);
+  border: 3px solid var(--paper);
+  box-shadow: 0 0 0 1px var(--rust);
+  flex-shrink: 0;
+  z-index: 2;
+}
+
+/* The card itself */
+.wn-card {
+  background: var(--paper-2);
+  border: 1px solid var(--paper-line);
+  border-radius: 12px;
+  padding: 20px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  text-align: center;
+}
+.wn-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  border-bottom: 1px solid var(--paper-line);
+  padding-bottom: 14px;
+}
+.wn-card-bottom { display: flex; flex-direction: column; gap: 6px; }
+
+.wn-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  flex-shrink: 0;
+}
+.wn-logo img {
+  display: block;
+  height: 44px;
+  width: auto;
+  max-width: 110px;
+  object-fit: contain;
+}
+.wn-logo-text {
+  font-family: var(--serif);
+  font-size: 34px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+.wn-year {
+  font-family: var(--serif);
+  font-size: 36px;
+  font-weight: 500;
+  color: var(--rust);
+  letter-spacing: -0.012em;
+  line-height: 1;
+}
+.wn-name {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.005em;
+  line-height: 1.2;
+}
+.wn-detail {
+  font-family: var(--sans);
+  font-size: 15px;
+  color: var(--text-soft);
+  line-height: 1.45;
+}
+
+/* Synthesis line under the timeline */
+.wn-synthesis {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(20px, 1.8vw, 28px);
+  color: var(--text);
+  text-align: center;
+  margin: 0;
+  max-width: 900px;
+  line-height: 1.4;
+}
+
+/* Choreography */
+.choreo-wn {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.6s cubic-bezier(.22, .61, .36, 1),
+    transform 0.6s cubic-bezier(.22, .61, .36, 1);
+}
+.wn-pos-above.choreo-wn { transform: translateY(-8px); }
+.narrative-scene.shown.choreo-play .choreo-wn[data-wn="0"] { opacity: 1; transform: none; transition-delay: 0.15s; }
+.narrative-scene.shown.choreo-play .choreo-wn[data-wn="1"] { opacity: 1; transform: none; transition-delay: 0.45s; }
+.narrative-scene.shown.choreo-play .choreo-wn[data-wn="2"] { opacity: 1; transform: none; transition-delay: 0.75s; }

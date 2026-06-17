@@ -54,10 +54,11 @@
         <!-- TOP: rotating headline (scene 0 = title; scenes 1-4 = story) -->
         <div class="scene-headlines" id="scene-headlines">
           <h1 class="scene-headline shown scene-headline-empty" data-scene="0" aria-hidden="true"></h1>
-          <h1 class="scene-headline" data-scene="1">
-            Today, toxicity is found by <em>dosing a human</em>. Of the drugs that enter clinical trials, <em>~90% never reach patients.</em>
-          </h1>
+          <h1 class="scene-headline scene-headline-empty" data-scene="1" aria-hidden="true"></h1>
           <h1 class="scene-headline" data-scene="2">
+            Regulators have spent a decade <em>inviting these models in.</em>
+          </h1>
+          <h1 class="scene-headline" data-scene="3">
             Drug development still proceeds <em>without a working model</em> of the body being dosed.
           </h1>
         </div>
@@ -92,6 +93,7 @@
                 </div>
 
                 <!-- Funnel: 4 bars (Phase I, II, III, Approved) in a 1100-wide viewBox.
+                     BIO/Informa 2011-2020 attrition: 100 → 52 → 14 → 8.
                      Left 220px of viewBox is empty space reserved for the timeline's Pre-clinical marker below. -->
                 <svg viewBox="0 0 1100 340" preserveAspectRatio="xMidYMid meet" class="funnel-svg">
 
@@ -101,37 +103,23 @@
                     <text class="funnel-bar-count" x="310" y="298" data-target="100">100</text>
                   </g>
 
-                  <!-- Phase II bar -->
+                  <!-- Phase II bar (52 → height 114) -->
                   <g class="funnel-bar funnel-bar-2" data-bar="1">
-                    <rect x="425" y="132" width="140" height="138" rx="4"/>
-                    <text class="funnel-bar-count" x="495" y="298" data-target="63">100</text>
+                    <rect x="425" y="156" width="140" height="114" rx="4"/>
+                    <text class="funnel-bar-count" x="495" y="298" data-target="52">100</text>
                   </g>
 
-                  <!-- Phase III bar -->
+                  <!-- Phase III bar (14 → height 31) -->
                   <g class="funnel-bar funnel-bar-3" data-bar="2">
-                    <rect x="610" y="202" width="140" height="68" rx="4"/>
-                    <text class="funnel-bar-count" x="680" y="298" data-target="31">100</text>
+                    <rect x="610" y="239" width="140" height="31" rx="4"/>
+                    <text class="funnel-bar-count" x="680" y="298" data-target="14">100</text>
                   </g>
 
-                  <!-- Approved bar -->
+                  <!-- Approved bar (8 → height 18) -->
                   <g class="funnel-bar funnel-bar-4" data-bar="3">
-                    <rect x="795" y="244" width="140" height="26" rx="4"/>
-                    <text class="funnel-bar-count" x="865" y="298" data-target="12">100</text>
+                    <rect x="795" y="252" width="140" height="18" rx="4"/>
+                    <text class="funnel-bar-count" x="865" y="298" data-target="8">100</text>
                   </g>
-
-                  <!-- Drop callouts in the gaps between bars.
-                       Bars end at: Phase I right=380, Phase II right=565, Phase III right=750.
-                       Next bar starts at: Phase II left=425, Phase III left=610, Approved left=795.
-                       Place labels at NEXT bar's left edge (text-anchor middle) so they hug
-                       the next bar's left side, never the previous bar's right. -->
-                  <text class="funnel-drop" data-bar="1" x="425" y="91">−37</text>
-                  <text class="funnel-drop-cause" data-bar="1" x="425" y="106">toxicity</text>
-
-                  <text class="funnel-drop" data-bar="2" x="610" y="167">−32</text>
-                  <text class="funnel-drop-cause" data-bar="2" x="610" y="182">efficacy</text>
-
-                  <text class="funnel-drop" data-bar="3" x="795" y="223">−19</text>
-                  <text class="funnel-drop-cause" data-bar="3" x="795" y="238">safety</text>
                 </svg>
 
                 <!-- Timeline strip — SAME viewBox WIDTH (1100) so columns align pixel-for-pixel.
@@ -169,23 +157,21 @@
                   </g>
                 </svg>
 
+                <p class="funnel-caption">~1 in 3 drugs fail on safety. Mechanistic models catch it upstream by predicting drug behavior in patients.</p>
+
               </div>
             </div>
 
-            <!-- SCENE 2: adoption stats above, big black-box visual below -->
-            <div class="narrative-scene scene-2" data-scene="2">
+            <!-- SCENE 3: adoption stats above, big black-box visual below -->
+            <div class="narrative-scene scene-3" data-scene="3">
               <div class="scene-eyebrow">The missing model</div>
               <div class="blackbox-viz">
 
                 <!-- Stat row across the top -->
                 <div class="bb-stats">
                   <div class="bb-stat choreo-text-in">
-                    <div class="bb-stat-num">~4%</div>
-                    <div class="bb-stat-label">of INDs use mechanistic modeling</div>
-                  </div>
-                  <div class="bb-stat choreo-text-in">
-                    <div class="bb-stat-num">~30%</div>
-                    <div class="bb-stat-label">of FDA approvals include it</div>
+                    <div class="bb-stat-num">&lt;33%</div>
+                    <div class="bb-stat-label">of FDA approvals include mechanistic modeling</div>
                   </div>
                   <div class="bb-stat choreo-text-in">
                     <div class="bb-stat-num">6&ndash;12 mo</div>
@@ -214,7 +200,65 @@
                   </svg>
                 </div>
 
-                <p class="bb-caption">The FDA calls mechanistic modeling the gold standard. The bottleneck is the parameter curation. That's what ParamAI builds.</p>
+                <p class="bb-caption">FDA, EMA, and ICH all accept models as regulatory evidence. The bottleneck is parameter curation. That's what ParamAI builds.</p>
+              </div>
+            </div>
+
+            <!-- SCENE 2: Why now — zigzag timeline of three regulatory milestones -->
+            <div class="narrative-scene scene-2" data-scene="2">
+              <div class="scene-eyebrow">Why now</div>
+              <div class="why-now-viz">
+
+                <div class="wn-timeline">
+                  <!-- horizontal track -->
+                  <div class="wn-track"></div>
+
+                  <!-- three milestone cards, alternating below/above/below -->
+                  <div class="wn-milestone wn-pos-below wn-pos-1 choreo-wn" data-wn="0">
+                    <div class="wn-dot"></div>
+                    <div class="wn-card">
+                      <div class="wn-card-top">
+                        <div class="wn-logo"><img src="assets/fda-logo.svg" alt="FDA" /></div>
+                        <div class="wn-year">2022</div>
+                      </div>
+                      <div class="wn-card-bottom">
+                        <div class="wn-name">FDA Modernization Act 2.0</div>
+                        <div class="wn-detail">Removes the animal-testing mandate. Computational models can substitute.</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="wn-milestone wn-pos-above wn-pos-2 choreo-wn" data-wn="1">
+                    <div class="wn-dot"></div>
+                    <div class="wn-card">
+                      <div class="wn-card-top">
+                        <div class="wn-logo"><img src="assets/fda-logo.svg" alt="FDA" /></div>
+                        <div class="wn-year">2024</div>
+                      </div>
+                      <div class="wn-card-bottom">
+                        <div class="wn-name">Project Optimus</div>
+                        <div class="wn-detail">FDA requires evidence-based dose finding in oncology. Mechanistic modeling becomes the standard approach.</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="wn-milestone wn-pos-below wn-pos-3 choreo-wn" data-wn="2">
+                    <div class="wn-dot"></div>
+                    <div class="wn-card">
+                      <div class="wn-card-top">
+                        <div class="wn-logo wn-logo-text">ICH</div>
+                        <div class="wn-year">2026</div>
+                      </div>
+                      <div class="wn-card-bottom">
+                        <div class="wn-name">ICH M15</div>
+                        <div class="wn-detail">A single global framework now governs how regulators assess model-informed submissions.</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <p class="wn-synthesis">The legal and regulatory groundwork is done. What's missing is the parameter curation.</p>
+
               </div>
             </div>
 
@@ -227,7 +271,7 @@
             <span class="scene-dot active" data-scene="0"></span>
             <span class="scene-dot" data-scene="1"></span>
             <span class="scene-dot" data-scene="2"></span>
-            
+            <span class="scene-dot" data-scene="3"></span>
           </div>
         </div>
 
@@ -245,18 +289,13 @@
        ============================================================ -->
   <section id="engine" class="engine">
 
-    <div class="engine-head">
-      <div class="eyebrow">Live walkthrough</div>
-      <h2 class="display">A complete parameterization, end to end.</h2>
-      <p class="engine-sub">
-        Below: ParamAI ingests a published pharmacokinetic study of <strong class="mol">gefitinib</strong>,
-        an FDA-approved EGFR inhibitor used in non-small-cell lung cancer, and produces a
-        simulation-ready model. Press <em>Begin</em>, then every stage flows automatically into the next.
-      </p>
+    <!-- Hidden run/reset buttons retained so engine.js bindings don't throw.
+         The demo auto-starts from Hero 1's right-arrow on the last scene. -->
+    <div class="engine-head engine-head-hidden">
       <div class="run-controls">
         <button class="btn btn-primary" id="run-all">
           <span class="play-icon">▶</span>
-          <span id="run-all-label">Begin parameterization</span>
+          <span id="run-all-label">Begin</span>
         </button>
         <button class="btn btn-ghost" id="reset-all">Reset</button>
       </div>
@@ -268,226 +307,199 @@
         <div class="ep-fill" id="ep-fill"></div>
       </div>
       <div class="ep-steps">
-        <div class="ep-step" data-step="1"><span>01</span><label>Source material</label></div>
+        <div class="ep-step" data-step="1"><span>01</span><label>Source</label></div>
         <div class="ep-step" data-step="2"><span>02</span><label>Extraction</label></div>
-        <div class="ep-step" data-step="3"><span>03</span><label>Solving</label></div>
-        <div class="ep-step" data-step="4"><span>04</span><label>Verifying</label></div>
+        <div class="ep-step" data-step="3"><span>03</span><label>Derivation</label></div>
+        <div class="ep-step" data-step="4"><span>04</span><label>Prediction</label></div>
       </div>
     </div>
 
     <!-- ============ ACT 1: THE PAPER & THE MODEL ============ -->
     <div class="act" id="act-1">
-      <div class="act-marker"><span>01</span> The source material</div>
-      <div class="act-grid two">
-        <div class="card paper-card">
-          <div class="card-head">
-            <div class="card-title">Source</div>
-            <div class="card-sub">Swaisland et al., 2005 · Clin. Pharmacokinet. · adapted</div>
+      <div class="act-marker"><span>01</span> Source</div>
+
+      <!-- Two-stage act: first the drug + model, then a literature search reveals the source paper. -->
+      <div class="src-stage">
+
+        <!-- Stage A: drug on left, simple 1-compartment model on right -->
+        <div class="src-pair" id="src-pair">
+          <div class="src-card src-card-drug">
+            <div class="src-card-label">Drug</div>
+            <img class="src-drug-img" src="assets/gefitinib.svg" alt="Gefitinib molecular structure" />
+            <div class="src-card-name">gefitinib</div>
+            <div class="src-card-sub">EGFR inhibitor · non-small-cell lung cancer</div>
           </div>
-          <div class="paper-body">
-            <p class="paper-title">Pharmacokinetics and bioavailability of gefitinib in healthy volunteers</p>
-            <p>Mean plasma clearance of gefitinib was <mark>CL = 28&nbsp;L/h</mark> with an apparent volume of distribution <mark>V<sub>d</sub> = 1400&nbsp;L</mark>. Reported hepatic extraction ratio <mark>E<sub>H</sub> = 0.81</mark> (portal sampling, n=8).</p>
-            <p>Urinary excretion accounted for <mark>CL<sub>R</sub> = 1.4&nbsp;L/h</mark>. Oral bioavailability was <mark>F = 0.59</mark>, absorption rate <mark>k<sub>a</sub> = 0.5&nbsp;1/h</mark>. Plasma protein binding gave <mark>f<sub>u</sub> = 0.09</mark>.</p>
-            <p class="paper-fade">&hellip; intrinsic clearance not reported &hellip; tissue partition coefficients omitted &hellip; elimination rate not derived &hellip;</p>
+
+          <div class="src-card src-card-model">
+            <div class="src-card-label">Model type</div>
+            <svg class="src-model-svg" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+              <!-- Geometry:
+                   Circle centered at (200, 100) with r=46 → left edge x=154, right edge x=246.
+                   Input arrow: from x=58 to x=140 (head tip at x=152, 2px clear of circle).
+                   Output arrow: from x=248 to x=320 (head tip at x=332).
+                   "dose" text ends ~x=50; "cleared" starts ~x=346.
+              -->
+              <text class="srcm-iolabel" x="20" y="106" text-anchor="start">dose</text>
+              <path class="srcm-arrow" d="M 58 100 L 140 100" />
+              <polygon class="srcm-arrow-head" points="140,95 152,100 140,105"/>
+              <text class="srcm-edge-label" x="100" y="86" text-anchor="middle">k_a</text>
+
+              <circle class="srcm-compartment" cx="200" cy="100" r="46"/>
+              <text class="srcm-comp-label" x="200" y="96" text-anchor="middle">central</text>
+              <text class="srcm-comp-label" x="200" y="114" text-anchor="middle">compartment</text>
+
+              <path class="srcm-arrow" d="M 248 100 L 320 100" />
+              <polygon class="srcm-arrow-head" points="320,95 332,100 320,105"/>
+              <text class="srcm-edge-label" x="284" y="86" text-anchor="middle">k_e</text>
+              <text class="srcm-iolabel" x="346" y="106" text-anchor="start">cleared</text>
+            </svg>
+            <div class="src-card-name">1-compartment PK</div>
+            <div class="src-card-sub">oral absorption, first-order clearance</div>
           </div>
         </div>
 
-        <div class="card model-card">
-          <div class="card-head">
-            <div class="card-title">Target model</div>
-            <div class="card-sub">1-compartment QSP, oral absorption, hepatic + renal clearance</div>
+        <!-- Stage B: literature search — a scrolling list of candidate titles, one highlights as the chosen source -->
+        <div class="src-search" id="src-search" aria-hidden="true">
+          <div class="src-search-head">
+            <span class="src-search-spinner"></span>
+            <span class="src-search-label">searching the literature for <strong>gefitinib pharmacokinetics</strong></span>
           </div>
-          <div class="model-body">
-            <div class="model-eq">
-              <div class="eq-label">Mass balance</div>
-              <div class="eq-math">
-                <span class="frac"><span class="num">dC</span><span class="den">dt</span></span>
-                <span>= </span>
-                <span class="frac"><span class="num">k<sub>a</sub> · F · D</span><span class="den">V<sub>d</sub></span></span>
-                <span>e<sup>−k<sub>a</sub>t</sup></span>
-                <span>− k<sub>e</sub> · C</span>
-              </div>
-            </div>
-            <div class="model-eq">
-              <div class="eq-label">Hepatic clearance (well-stirred)</div>
-              <div class="eq-math">
-                <span>CL<sub>H</sub> = </span>
-                <span class="frac"><span class="num">Q<sub>H</sub> · f<sub>u</sub> · CL<sub>int</sub></span><span class="den">Q<sub>H</sub> + f<sub>u</sub> · CL<sub>int</sub></span></span>
-              </div>
-            </div>
-            <p class="model-note">To simulate gefitinib, the engine needs <strong>13 parameters</strong>. The paper supplies 9. Four must be derived, and any contradiction between them must be resolved.</p>
+          <div class="src-search-list" id="src-search-list">
+            <div class="src-search-row" data-srow="0">Li et al., 2008 · Drug Metab. Dispos. · "Pharmacokinetic interactions of gefitinib with rifampicin"</div>
+            <div class="src-search-row" data-srow="1">McKillop et al., 2004 · Br. J. Cancer · "Metabolic disposition of gefitinib in human liver microsomes"</div>
+            <div class="src-search-row" data-srow="2">Swaisland et al., 2005 · Clin. Pharmacokinet. · "Pharmacokinetics and bioavailability of gefitinib in healthy volunteers"</div>
+            <div class="src-search-row" data-srow="3">Ranson et al., 2002 · J. Clin. Oncol. · "ZD1839, an EGFR-targeted oral cancer agent, in patients with advanced solid tumours"</div>
+            <div class="src-search-row" data-srow="4">Albanell et al., 2002 · J. Clin. Oncol. · "Pharmacodynamic studies of EGFR inhibitor in skin"</div>
+            <div class="src-search-row" data-srow="5">Cohen et al., 2003 · Clin. Cancer Res. · "Approval summary: gefitinib for NSCLC"</div>
           </div>
         </div>
+
       </div>
-      <div class="flow-arrow" id="flow-1-2"><span></span></div>
     </div>
 
     <!-- ============ ACT 2: EXTRACTION ============ -->
     <div class="act" id="act-2">
-      <div class="act-marker"><span>02</span> Structured extraction</div>
-      <div class="act-narrative">
-        <p>ParamAI reads the paper and emits structured parameters with full citation provenance. Each row carries its source section, sample size, and method. <strong>Items the paper does not contain are explicitly flagged as missing</strong>, to be derived in the next stage.</p>
-      </div>
+      <div class="act-marker"><span>02</span> Extraction</div>
 
-      <div class="extract-stage">
-        <div class="card extract-card">
-          <div class="card-head">
-            <div class="card-title">Extracted parameters</div>
-            <div class="card-sub" id="extract-counter">0 found · 0 flagged</div>
+      <div class="ext-stage" id="ext-stage">
+
+        <!-- LEFT: the paper, with marked-up parameter values + missing-callout overlays -->
+        <div class="ext-paper">
+          <div class="ext-paper-eyebrow">source</div>
+          <div class="ext-paper-title">Pharmacokinetics and bioavailability of gefitinib in healthy volunteers</div>
+          <div class="ext-paper-cite">Swaisland et al., 2005 · Clin. Pharmacokinet.</div>
+          <div class="ext-paper-body">
+            <p>Mean plasma clearance of gefitinib was <mark class="ext-mark" data-param="cl" data-pk="CL" data-pv="28 L/h">CL = 28 L/h</mark>, with apparent volume of distribution <mark class="ext-mark" data-param="vd" data-pk="V_d" data-pv="1400 L">V_d = 1400 L</mark>.</p>
+            <p>Urinary excretion accounted for <mark class="ext-mark" data-param="clr" data-pk="CL_R" data-pv="1.4 L/h">CL_R = 1.4 L/h</mark>. Oral bioavailability was <mark class="ext-mark" data-param="f" data-pk="F" data-pv="0.59">F = 0.59</mark> with absorption rate <mark class="ext-mark" data-param="ka" data-pk="k_a" data-pv="0.5 1/h">k_a = 0.5 1/h</mark>. Plasma protein binding gave <mark class="ext-mark" data-param="fu" data-pk="f_u" data-pv="0.09">f_u = 0.09</mark>.</p>
+            <p>Hepatic blood flow assumed at standard reference value of <mark class="ext-mark" data-param="qh" data-pk="Q_H" data-pv="90 L/h">Q_H = 90 L/h</mark>.</p>
+            <p class="ext-paper-fade">… intrinsic clearance not reported … tissue partition coefficients omitted … elimination rate not derived …</p>
           </div>
-          <div class="extract-list" id="extract-list"></div>
+
+          <!-- Missing-value callouts (red circle overlays). Position is set in CSS as absolute. -->
+          <div class="ext-missing ext-missing-1" id="ext-miss-1">
+            <div class="ext-missing-ring"></div>
+            <div class="ext-missing-label">intrinsic clearance</div>
+          </div>
         </div>
 
-        <div class="card missing-card">
-          <div class="card-head accent">
-            <div class="card-title">Required but not found</div>
-            <div class="card-sub">Must be derived from physiology</div>
+        <!-- RIGHT: parameter list filling in as values fly over -->
+        <div class="ext-list-wrap">
+          <div class="ext-list-head">
+            <div class="ext-list-title">Extracted parameters</div>
+            <div class="ext-list-count" id="ext-list-count">0 of 7</div>
           </div>
-          <div class="missing-list" id="missing-list"></div>
-          <div class="missing-foot">
-            <span class="pulse-dot"></span>
-            <span id="missing-status">awaiting extraction&hellip;</span>
+          <div class="ext-list" id="ext-list"></div>
+
+          <div class="ext-missing-head">
+            <div class="ext-missing-title">Missing — needs derivation</div>
           </div>
+          <div class="ext-missing-list" id="ext-missing-list"></div>
         </div>
+
+        <!-- Overlay for the flying values (animated copies) -->
+        <div class="ext-fly-layer" id="ext-fly-layer" aria-hidden="true"></div>
+
       </div>
-      <div class="flow-arrow" id="flow-2-3"><span></span></div>
     </div>
 
-    <!-- ============ ACT 4: VERIFYING — confirm derived values are physiology-consistent ============ -->
+    <!-- ============ ACT 3: DERIVATION — derive the one missing parameter ============ -->
     <div class="act act-3-block" id="act-3">
-      <div class="act-marker"><span>03</span> Solving</div>
-      <div class="act-narrative">
-        <p>ParamAI locks the <em>established</em> biology, values we know cannot move, like liver blood flow, and solves the equations backwards for the missing parameters.</p>
-      </div>
+      <div class="act-marker"><span>03</span> Derivation</div>
 
-      <div class="derive-stage">
-        <div class="card derive-card">
-          <div class="card-head accent">
-            <div class="card-title">Locked physiological constants</div>
-          </div>
-          <div class="locks">
-            <div class="lock-row">
-              <div class="lk-name">Q<sub>H</sub></div>
-              <div class="lk-val">90&nbsp;L/h</div>
-              <div class="lk-src">Davies &amp; Morris, 1993, human liver blood flow</div>
-            </div>
-            <div class="lock-row">
-              <div class="lk-name">V<sub>d</sub></div>
-              <div class="lk-val">1400&nbsp;L</div>
-              <div class="lk-src">extensive tissue distribution, lipophilic compound</div>
-            </div>
-            <div class="lock-row">
-              <div class="lk-name">f<sub>u</sub></div>
-              <div class="lk-val">0.09</div>
-              <div class="lk-src">paper §3.4, ultrafiltration cross-validated</div>
-            </div>
-          </div>
+      <div class="der-stage" id="der-stage">
 
-          <div class="solve-frame">
-            <div class="solve-head">
-              <span class="solve-dot"></span>
-              <span>Solving the well-stirred equation for CL<sub>int</sub></span>
-            </div>
-            <div class="solve-formula">
-              <span>CL<sub>H</sub> = </span>
-              <span class="frac"><span class="num">Q<sub>H</sub> · f<sub>u</sub> · CL<sub>int</sub></span><span class="den">Q<sub>H</sub> + f<sub>u</sub> · CL<sub>int</sub></span></span>
-              <span class="arrow">→</span>
-              <span>CL<sub>int</sub> = </span>
-              <span class="frac"><span class="num">Q<sub>H</sub> · CL<sub>H</sub></span><span class="den">f<sub>u</sub> · (Q<sub>H</sub> − CL<sub>H</sub>)</span></span>
-            </div>
-            <div class="solve-substitution" id="solve-substitution"></div>
-            <div class="solve-result-row">
-              <div class="solve-result-label">Solver state</div>
-              <div class="solve-result-value" id="solve-result-value">awaiting input&hellip;</div>
-            </div>
-          </div>
+        <!-- Goal banner: "derive intrinsic clearance" -->
+        <div class="der-goal">
+          <div class="der-goal-label">Deriving</div>
+          <div class="der-goal-target">intrinsic clearance</div>
+          <div class="der-goal-from">from locked physiology</div>
+        </div>
 
-          <div class="recovered" id="recovered">
-            <div class="recovered-head">Parameters recovered ← were missing in Act 02</div>
-            <div class="rec-grid">
-              <div class="rec-item" data-rec="clint">
-                <div class="rec-key">CL<sub>int</sub></div>
-                <div class="rec-val">—</div>
-                <div class="rec-note">intrinsic clearance, derived</div>
-              </div>
-              <div class="rec-item" data-rec="eh">
-                <div class="rec-key">E<sub>H</sub> <span class="rec-fix">reconciled</span></div>
-                <div class="rec-val">—</div>
-                <div class="rec-note">replaces paper's 0.81, contradiction resolved</div>
-              </div>
-              <div class="rec-item" data-rec="ke">
-                <div class="rec-key">k<sub>e</sub></div>
-                <div class="rec-val">—</div>
-                <div class="rec-note">elimination rate constant, CL / V<sub>d</sub></div>
-              </div>
-              <div class="rec-item" data-rec="tp">
-                <div class="rec-key">K<sub>p,tissue</sub></div>
-                <div class="rec-val">—</div>
-                <div class="rec-note">tissue partition coeff., from f<sub>u</sub> + lipophilicity</div>
-              </div>
-            </div>
+        <!-- Locked inputs (three chips slide in from above) -->
+        <div class="der-inputs">
+          <div class="der-input der-input-1">
+            <div class="der-input-name">liver blood flow</div>
+            <div class="der-input-val">90 L/h</div>
+          </div>
+          <div class="der-input der-input-2">
+            <div class="der-input-name">hepatic clearance</div>
+            <div class="der-input-val">26.6 L/h</div>
+          </div>
+          <div class="der-input der-input-3">
+            <div class="der-input-name">unbound fraction</div>
+            <div class="der-input-val">0.09</div>
           </div>
         </div>
 
-        <div class="card audit-card">
-          <div class="card-head subtle">
-            <div class="card-title">FDA-grade audit trail</div>
-            <div class="card-sub">every value, every step</div>
+        <!-- Solver: shows the well-stirred equation, then computes and reveals the result -->
+        <div class="der-solver" id="der-solver">
+          <div class="der-solver-label">well-stirred equation, solved for intrinsic clearance</div>
+          <div class="der-solver-formula" id="der-solver-formula">
+            <span class="dsf-result">CL<sub>int</sub></span>
+            <span class="dsf-eq">=</span>
+            <span class="dsf-frac">
+              <span class="dsf-num">Q<sub>H</sub> · CL<sub>H</sub></span>
+              <span class="dsf-den">f<sub>u</sub> · (Q<sub>H</sub> − CL<sub>H</sub>)</span>
+            </span>
           </div>
-          <div class="audit-stream" id="audit-stream"></div>
+          <div class="der-solver-substitution" id="der-substitution"></div>
         </div>
+
+        <!-- The answer chip: rolls in olive when the solver finishes -->
+        <div class="der-answer" id="der-answer">
+          <div class="der-answer-name">intrinsic clearance</div>
+          <div class="der-answer-val"><span id="der-answer-val">—</span> <span class="der-answer-unit">L/h</span></div>
+          <div class="der-answer-tag">derived ✓</div>
+        </div>
+
       </div>
     </div>
 
-    <!-- ============ ACT 3: SOLVING — inverse-derive missing parameters ============ -->
+    <!-- ============ ACT 4: PREDICTION — assemble model, generate prediction, hand off ============ -->
     <div class="act act-4-block" id="act-4">
-      <div class="act-marker"><span>04</span> Verifying</div>
-      <div class="act-narrative">
-        <p>The newly derived parameter set is tested against the laws of human physiology. The contradiction from the paper is gone; the model is now mass-balance consistent and ready to simulate.</p>
-      </div>
+      <div class="act-marker"><span>04</span> Prediction</div>
 
-      <div class="balance-stage">
-        <div class="card balance-card">
-          <div class="card-head accent">
-            <div class="card-title">Hepatic mass-balance check</div>
-            <div class="card-sub">Q<sub>H</sub> · E<sub>H</sub> ≤ CL<sub>H</sub></div>
-          </div>
-          <div class="balance-rows">
-            <div class="brow" data-row="qh">
-              <div class="brow-icon"></div>
-              <div class="brow-label">Reference Q<sub>H</sub> · human liver blood flow</div>
-              <div class="brow-val">90.0&nbsp;L/h</div>
-            </div>
-            <div class="brow" data-row="clh">
-              <div class="brow-icon"></div>
-              <div class="brow-label">Implied CL<sub>H</sub> = CL − CL<sub>R</sub></div>
-              <div class="brow-val">26.6&nbsp;L/h</div>
-            </div>
-            <div class="brow" data-row="eh">
-              <div class="brow-icon"></div>
-              <div class="brow-label">Derived E<sub>H</sub> from physiology</div>
-              <div class="brow-val">0.32</div>
-            </div>
-            <div class="brow" data-row="impl">
-              <div class="brow-icon"></div>
-              <div class="brow-label">Required CL<sub>H</sub> at derived E<sub>H</sub></div>
-              <div class="brow-val">26.6&nbsp;L/h</div>
-            </div>
-          </div>
+      <div class="pred-stage" id="pred-stage">
+
+        <!-- 8 small parameter chips converge into the model box -->
+        <div class="pred-params" id="pred-params">
+          <span class="pp-chip" data-pp="0">CL</span>
+          <span class="pp-chip" data-pp="1">V_d</span>
+          <span class="pp-chip" data-pp="2">F</span>
+          <span class="pp-chip" data-pp="3">k_a</span>
+          <span class="pp-chip" data-pp="4">f_u</span>
+          <span class="pp-chip" data-pp="5">Q_H</span>
+          <span class="pp-chip" data-pp="6">CL_R</span>
+          <span class="pp-chip pp-derived" data-pp="7">CL_int</span>
         </div>
 
-        <div class="card naive-card">
-          <div class="card-head subtle">
-            <div class="card-title">Model status</div>
-          </div>
-          <div class="naive-body">
-            <div class="naive-line good"><span class="naive-ok">✓</span> all parameters extracted</div>
-            <div class="naive-line good"><span class="naive-ok">✓</span> all missing values derived</div>
-            <div class="naive-line good"><span class="naive-ok">✓</span> mass balance consistent</div>
-            <div class="naive-divider"></div>
-            <div class="naive-line good"><span class="naive-ok">✓</span> <strong>Model is ready to simulate.</strong></div>
-          </div>
+        <!-- The model box (assembled when chips converge) -->
+        <div class="pred-model" id="pred-model">
+          <div class="pred-model-label">model assembled</div>
+          <div class="pred-model-name">gefitinib · 1-compartment PK</div>
+          <div class="pred-model-status" id="pred-model-status">ready</div>
         </div>
+
       </div>
     </div>
 
@@ -510,13 +522,13 @@
             See toxic exposure <em>before a single patient is dosed.</em>
           </h1>
           <h1 class="scene-headline" data-deck-scene="1">
-            No one else has the <em>physics and the data,</em> together.
+            No one else has the <em>physiology and the data,</em> together.
           </h1>
           <h1 class="scene-headline" data-deck-scene="2">
             A <em>$4.6B</em> market growing at <em>~14% CAGR.</em>
           </h1>
           <h1 class="scene-headline" data-deck-scene="3">
-            What pharma gets, <em>measured.</em>
+            What pharma gets <em>back.</em>
           </h1>
           <h1 class="scene-headline scene-headline-empty" data-deck-scene="4" aria-hidden="true"></h1>
         </div>
@@ -528,7 +540,10 @@
             <div class="narrative-scene scene-deck2-0 shown" data-deck-scene="0">
               <div class="scene-eyebrow">The prediction</div>
               <div class="curve-viz">
-                <svg viewBox="0 0 820 260" preserveAspectRatio="xMidYMid meet" class="curve-svg curve-svg-deck2">
+                <svg viewBox="0 -10 820 280" preserveAspectRatio="xMidYMid meet" class="curve-svg curve-svg-deck2">
+
+                  <!-- Chart title -->
+                  <text class="cv-title" x="56" y="8">Plasma concentration · 250 mg gefitinib</text>
 
                   <!-- AUC fills under each curve -->
                   <path class="cv-auc cv-auc-naive" id="d2-cv-auc-naive-path" d="" />
@@ -552,21 +567,29 @@
                   <path class="cv-observed-line" id="d2-cv-observed-line" d="" />
                   <g id="d2-cv-observed-dots"></g>
 
-                  <!-- right-edge label panel -->
+                  <!-- right-edge label panel — each block is wrapped so JS can fade them in sync with the curves -->
                   <g class="cv-legend">
-                    <line class="cv-legend-swatch cv-legend-swatch-good"  x1="570" y1="80" x2="600" y2="80" />
-                    <text class="cv-legend-name cv-legend-name-good"      x="608" y="84">ParamAI</text>
-                    <text class="cv-legend-auc cv-legend-auc-good"        x="608" y="102" id="d2-cv-auc-good-text">AUC = —</text>
+                    <g class="cv-legend-block" id="d2-legend-good">
+                      <line class="cv-legend-swatch cv-legend-swatch-good"  x1="570" y1="80" x2="600" y2="80" />
+                      <text class="cv-legend-name cv-legend-name-good"      x="608" y="84">ParamAI</text>
+                      <text class="cv-legend-auc cv-legend-auc-good"        x="608" y="102" id="d2-cv-auc-good-text">AUC = —</text>
+                    </g>
 
-                    <line class="cv-legend-swatch cv-legend-swatch-naive" x1="570" y1="130" x2="600" y2="130" />
-                    <text class="cv-legend-name cv-legend-name-naive"     x="608" y="134">animal testing<tspan class="cv-asterisk">*</tspan></text>
-                    <text class="cv-legend-auc cv-legend-auc-naive"       x="608" y="152" id="d2-cv-auc-naive-text">AUC = —</text>
+                    <g class="cv-legend-block" id="d2-legend-naive">
+                      <line class="cv-legend-swatch cv-legend-swatch-naive" x1="570" y1="130" x2="600" y2="130" />
+                      <text class="cv-legend-name cv-legend-name-naive"     x="608" y="134">animal testing<tspan class="cv-asterisk">*</tspan></text>
+                      <text class="cv-legend-auc cv-legend-auc-naive"       x="608" y="152" id="d2-cv-auc-naive-text">AUC = —</text>
+                    </g>
 
-                    <line class="cv-legend-swatch cv-legend-swatch-obs"   x1="570" y1="180" x2="600" y2="180" />
-                    <text class="cv-legend-name cv-legend-name-obs"       x="608" y="184">observed</text>
-                    <text class="cv-legend-auc cv-legend-auc-obs"         x="608" y="202">clinical samples</text>
+                    <g class="cv-legend-block" id="d2-legend-obs">
+                      <line class="cv-legend-swatch cv-legend-swatch-obs"   x1="570" y1="180" x2="600" y2="180" />
+                      <text class="cv-legend-name cv-legend-name-obs"       x="608" y="184">observed</text>
+                      <text class="cv-legend-auc cv-legend-auc-obs"         x="608" y="202">clinical samples</text>
+                    </g>
 
-                    <text class="cv-legend-ratio cv-legend-ratio-naive" x="608" y="230" id="d2-cv-auc-ratio"><tspan class="cv-asterisk">*</tspan> underestimates by —</text>
+                    <g class="cv-legend-block" id="d2-legend-ratio">
+                      <text class="cv-legend-ratio cv-legend-ratio-naive" x="608" y="230" id="d2-cv-auc-ratio"><tspan class="cv-asterisk">*</tspan> underestimates by —</text>
+                    </g>
                   </g>
 
                   <!-- annotation -->
@@ -579,7 +602,7 @@
 
             <!-- DECK-2 SCENE 1: competitive landscape quadrant chart -->
             <div class="narrative-scene scene-deck2-1" data-deck-scene="1">
-              <div class="scene-eyebrow">The wedge</div>
+              <div class="scene-eyebrow">Competitive advantage</div>
               <div class="quadrant-viz">
                 <svg viewBox="0 0 900 540" preserveAspectRatio="xMidYMid meet" class="quadrant-svg">
 
@@ -597,7 +620,7 @@
 
                   <!-- axis labels -->
                   <text class="q-axis-label q-axis-label-x" x="470" y="488" text-anchor="middle">Uses real human physiology →</text>
-                  <text class="q-axis-label q-axis-label-y" x="-255" y="48" transform="rotate(-90)" text-anchor="middle">Scales without manual curation →</text>
+                  <text class="q-axis-label q-axis-label-y" x="48" y="255" text-anchor="middle" transform="rotate(-90 48 255)">Scales across compounds, automatically →</text>
 
                   <!-- quadrant background tints -->
                   <rect class="q-quadrant q-quadrant-tr" x="470" y="60"  width="390" height="195"/>
@@ -606,7 +629,7 @@
                   <g class="q-point choreo-q-point" data-q="0">
                     <circle cx="200" cy="180" r="11"/>
                     <text class="q-point-label" x="200" y="158" text-anchor="middle">Generic LLM extractors</text>
-                    <text class="q-point-sub" x="200" y="206" text-anchor="middle">scales — but no physics</text>
+                    <text class="q-point-sub" x="200" y="206" text-anchor="middle">scales, but no physiology</text>
                   </g>
 
                   <g class="q-point choreo-q-point" data-q="1">
@@ -618,7 +641,7 @@
                   <g class="q-point choreo-q-point" data-q="2">
                     <circle cx="600" cy="395" r="11"/>
                     <text class="q-point-label" x="600" y="373" text-anchor="middle">PBPK simulators (Simcyp, GastroPlus)</text>
-                    <text class="q-point-sub" x="600" y="421" text-anchor="middle">physics-based — but you curate every parameter</text>
+                    <text class="q-point-sub" x="600" y="421" text-anchor="middle">physiology-based, but you curate every parameter</text>
                   </g>
 
                   <g class="q-point choreo-q-point" data-q="3">
@@ -633,7 +656,7 @@
                     <circle class="q-point-paramai-halo"  cx="770" cy="145" r="22"/>
                     <circle class="q-point-paramai-dot"   cx="770" cy="145" r="14"/>
                     <text class="q-point-label q-point-label-paramai" x="770" y="118" text-anchor="middle">ParamAI</text>
-                    <text class="q-point-sub q-point-sub-paramai"     x="770" y="180" text-anchor="middle">physics + auto-curation</text>
+                    <text class="q-point-sub q-point-sub-paramai"     x="770" y="180" text-anchor="middle">physiology + auto-curation</text>
                   </g>
 
                 </svg>
@@ -675,42 +698,30 @@
               </div>
             </div>
 
-            <!-- DECK-2 SCENE 3: value to pharma — flat table with header row -->
+            <!-- DECK-2 SCENE 3: three-beat narration — save time, decrease failure, savings math -->
             <div class="narrative-scene scene-deck2-3" data-deck-scene="3">
               <div class="scene-eyebrow">Value to pharma</div>
               <div class="value-viz">
-                <div class="value-table">
-                  <div class="value-thead">
-                    <div class="value-th value-th-metric">Metric</div>
-                    <div class="value-th value-th-before">Today</div>
-                    <div class="value-th value-th-after">With ParamAI</div>
-                  </div>
-                  <div class="value-row choreo-v" data-v="0">
-                    <div class="value-row-label">Time to first PBPK model</div>
-                    <div class="value-row-before">6–12 months</div>
-                    <div class="value-row-after">&lt; 1 week</div>
-                  </div>
-                  <div class="value-row choreo-v" data-v="1">
-                    <div class="value-row-label">Cost per validated model</div>
-                    <div class="value-row-before">$100K–$500K</div>
-                    <div class="value-row-after">marginal</div>
-                  </div>
-                  <div class="value-row choreo-v" data-v="2">
-                    <div class="value-row-label">Trial failures predictable upstream</div>
-                    <div class="value-row-before">unknowable pre-clinical</div>
-                    <div class="value-row-after">~24% of safety failures</div>
-                  </div>
-                  <div class="value-row choreo-v" data-v="3">
-                    <div class="value-row-label">FDA-grade audit trail</div>
-                    <div class="value-row-before">manual reconstruction</div>
-                    <div class="value-row-after">auto-generated</div>
-                  </div>
-                  <div class="value-row choreo-v" data-v="4">
-                    <div class="value-row-label">Mechanistic modeling adoption</div>
-                    <div class="value-row-before">~4% of INDs</div>
-                    <div class="value-row-after">every IND</div>
-                  </div>
+
+                <div class="value-beat choreo-v" data-v="0">
+                  <div class="value-beat-eyebrow">Save time</div>
+                  <div class="value-beat-headline"><span class="vb-before">6–12 months</span> <span class="vb-arrow">→</span> <span class="vb-after">days</span></div>
+                  <div class="value-beat-sub">Time to build a model for a new drug, at a fraction of the cost.</div>
                 </div>
+
+                <div class="value-beat choreo-v" data-v="1">
+                  <div class="value-beat-eyebrow">Explore more, fail less</div>
+                  <div class="value-beat-headline">Pharma can model <span class="vb-after">more candidates</span> and catch <span class="vb-after">more failures upstream</span></div>
+                  <div class="value-beat-sub">More candidates screened. Fewer surprises in patients.</div>
+                </div>
+
+                <div class="value-beat choreo-v" data-v="2">
+                  <div class="value-beat-eyebrow">Worth what?</div>
+                  <div class="value-beat-headline">A <span class="vb-after">1%</span> drop in late-stage failure rate <span class="vb-after">≈ $10M</span> per drug</div>
+                  <div class="value-beat-math">1% absolute reduction &nbsp;×&nbsp; ~$1B sunk cost per failed late-stage asset</div>
+                  <div class="value-beat-cite">Wouters et al. 2020, JAMA · DiMasi et al. 2016, J. Health Econ.</div>
+                </div>
+
               </div>
             </div>
 
