@@ -2916,11 +2916,12 @@ p:last-child { margin-bottom: 0; }
 
 /* The figure slides are dense; reclaim the scene padding and the eyebrow's
    bottom margin so the image gets the maximum possible box. */
-.scene-deck2-4, .scene-deck2-5, .scene-deck2-6 {
+.scene-deck2-4, .scene-deck2-5, .scene-deck2-6, .scene-deck2-7 {
   padding: 20px 24px 22px;
 }
 .scene-deck2-4 .scene-eyebrow,
 .scene-deck2-5 .scene-eyebrow,
-.scene-deck2-6 .scene-eyebrow {
+.scene-deck2-6 .scene-eyebrow,
+.scene-deck2-7 .scene-eyebrow {
   margin-bottom: 10px;
 }
