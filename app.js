@@ -681,8 +681,8 @@
     { label: "Read Tmax from the PK summary",               cl:[9.0,15.9,24.7],  med:0.207, lo:0.128, hi:0.332, p:0.546, H:3.60 },
     { label: "Read the Phase I AUC table",                  cl:[8.1,14.4,23.1],  med:0.253, lo:0.150, hi:0.390, p:0.791, H:3.63 }
   ];
-  const N = 900;              // drawn particles; the real filter carries 4,000
-  const XMIN = 4, XMAX = 52;  // clearance axis, L/h
+  const N = 900;               // drawn particles; the real filter carries 4,000
+  const XMIN = 3, XMAX = 160;  // clearance axis, L/h, log spaced
   const TRUTH = 15.9;
 
   const cv = document.getElementById('bay-canvas');
@@ -691,23 +691,34 @@
   let W = cv.width, H = cv.height;
 
   // Match the backing store to the CSS box so the dots stay crisp.
+  // Returns false when the element has no layout yet (scene still hidden),
+  // which is the normal case at load time.
   function resize() {
     const r = cv.getBoundingClientRect();
-    if (!r.width || !r.height) return;
+    if (!r.width || !r.height) return false;
     const dpr = window.devicePixelRatio || 1;
-    cv.width = Math.round(r.width * dpr);
-    cv.height = Math.round(r.height * dpr);
+    const bw = Math.round(r.width * dpr), bh = Math.round(r.height * dpr);
+    if (cv.width !== bw || cv.height !== bh) {
+      cv.width = bw; cv.height = bh;
+    }
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     W = r.width; H = r.height;
+    return true;
   }
-  window.addEventListener('resize', () => { resize(); paint(); });
+  window.addEventListener('resize', () => { if (resize()) paint(); });
 
   const $ = id => document.getElementById(id);
   const elN = $('bay-stepn'), elLabel = $('bay-label'), elMed = $('bay-med'),
         elRange = $('bay-range'), elFill = $('bay-fill'), elP = $('bay-p'),
         elH = $('bay-h'), elReplay = $('bay-replay');
 
-  const xpix = cl => ((Math.min(Math.max(cl, XMIN), XMAX) - XMIN) / (XMAX - XMIN)) * (W - 40) + 20;
+  // Log axis: clearance spans more than an order of magnitude at the prior,
+  // and a linear axis pins most of the cloud against the right edge.
+  const LM = Math.log(XMIN), LX = Math.log(XMAX);
+  const xpix = cl => {
+    const v = Math.log(Math.min(Math.max(cl, XMIN), XMAX));
+    return ((v - LM) / (LX - LM)) * (W - 40) + 20;
+  };
 
   // Draw from a lognormal whose 5th/95th percentiles match the step's reported
   // interval, so the cloud is the posterior rather than decoration.
@@ -727,6 +738,9 @@
   let particles = sample(STEPS[0]).map(v => ({ x: v, tx: v, y: Math.random(), seed: Math.random() }));
 
   function paint() {
+    // The scene is hidden at load, so the first successful measurement
+    // happens here rather than at init.
+    if (!W || !H || cv.width === 0) { if (!resize()) return; }
     ctx.clearRect(0, 0, W, H);
 
     // truth marker
@@ -786,14 +800,36 @@
   paint();
   if (elReplay) elReplay.addEventListener('click', play);
 
-  // Autoplay once the slide is actually shown.
+  // Autoplay once the slide is actually shown. Two triggers, because
+  // neither alone is sufficient: the class observer misses the case where
+  // the scene is already .shown, and the intersection observer misses
+  // scene switches that happen while the deck is already on screen.
   const scene = document.querySelector('.scene-deck2-7');
   if (scene) {
     let played = false;
+
+    function maybePlay() {
+      if (!scene.classList.contains('shown')) return;
+      const r = cv.getBoundingClientRect();
+      if (!r.width || !r.height) return;      // not laid out yet
+      if (played) return;
+      played = true;
+      resize();
+      setTimeout(play, 300);
+    }
+
     new MutationObserver(() => {
-      const on = scene.classList.contains('shown');
-      if (on && !played) { played = true; resize(); setTimeout(play, 350); }
-      if (!on) { played = false; clearInterval(timer); }
+      if (scene.classList.contains('shown')) maybePlay();
+      else { played = false; clearInterval(timer); }
     }).observe(scene, { attributes: true, attributeFilter: ['class'] });
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver((entries) => {
+        for (const e of entries) if (e.isIntersecting) maybePlay();
+      }, { threshold: 0.25 }).observe(scene);
+    }
+
+    // Covers a hard reload that lands directly on this scene.
+    maybePlay();
   }
 })();
