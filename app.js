@@ -695,7 +695,14 @@
   // which is the normal case at load time.
   function resize() {
     const r = cv.getBoundingClientRect();
-    if (!r.width || !r.height) return false;
+    // Fall back to the attribute size if layout gives us nothing, so a
+    // collapsed flex box degrades to a drawn canvas rather than a blank one.
+    if (!r.width || !r.height) {
+      if (!cv.width || !cv.height) return false;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      W = cv.width; H = cv.height;
+      return true;
+    }
     const dpr = window.devicePixelRatio || 1;
     const bw = Math.round(r.width * dpr), bh = Math.round(r.height * dpr);
     if (cv.width !== bw || cv.height !== bh) {
@@ -808,28 +815,32 @@
   if (scene) {
     let played = false;
 
-    function maybePlay() {
+    function maybePlay(tries) {
       if (!scene.classList.contains('shown')) return;
-      const r = cv.getBoundingClientRect();
-      if (!r.width || !r.height) return;      // not laid out yet
       if (played) return;
+      const r = cv.getBoundingClientRect();
+      if (!r.width || !r.height) {
+        // Transitions can leave the box unmeasurable for a frame or two.
+        if ((tries || 0) < 10) return void setTimeout(() => maybePlay((tries || 0) + 1), 120);
+        // Give up waiting and draw at the attribute size anyway.
+      }
       played = true;
       resize();
       setTimeout(play, 300);
     }
 
     new MutationObserver(() => {
-      if (scene.classList.contains('shown')) maybePlay();
+      if (scene.classList.contains('shown')) maybePlay(0);
       else { played = false; clearInterval(timer); }
     }).observe(scene, { attributes: true, attributeFilter: ['class'] });
 
     if ('IntersectionObserver' in window) {
       new IntersectionObserver((entries) => {
-        for (const e of entries) if (e.isIntersecting) maybePlay();
+        for (const e of entries) if (e.isIntersecting) maybePlay(0);
       }, { threshold: 0.25 }).observe(scene);
     }
 
     // Covers a hard reload that lands directly on this scene.
-    maybePlay();
+    maybePlay(0);
   }
 })();

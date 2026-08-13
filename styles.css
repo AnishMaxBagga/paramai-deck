@@ -2945,16 +2945,25 @@ p:last-child { margin-bottom: 0; }
 }
 .bay-in-v { font-size: 14px; color: var(--text); font-weight: 500; }
 
-.bay-body { flex: 1; min-height: 0; display: flex; gap: 28px; }
+.bay-body { flex: 1 1 auto; min-height: 300px; display: flex; gap: 28px; }
 
-.bay-left { flex: 1 1 62%; min-width: 0; display: flex; flex-direction: column; }
+.bay-left {
+  flex: 1 1 62%; min-width: 0; min-height: 260px;
+  display: flex; flex-direction: column;
+}
 .bay-h {
   font-size: 13px; font-weight: 650; color: var(--text);
   margin-bottom: 8px; flex: 0 0 auto;
 }
 .bay-h-sub { font-weight: 400; color: var(--text-muted); }
 .bay-canvas {
-  flex: 1; min-height: 0; width: 100%;
+  /* Explicit height. An earlier version used flex:1 inside a chain that never
+     resolved to a real height, so the element measured zero and nothing drew. */
+  flex: 1 1 auto;
+  min-height: 240px;
+  height: 100%;
+  width: 100%;
+  display: block;
   background: #fbfbfa; border: 1px solid var(--paper-line); border-radius: 8px;
 }
 .bay-axis {
