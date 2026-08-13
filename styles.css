@@ -2865,3 +2865,62 @@ p:last-child { margin-bottom: 0; }
 .narrative-scene.shown.choreo-play .choreo-wn[data-wn="0"] { opacity: 1; transform: none; transition-delay: 0.15s; }
 .narrative-scene.shown.choreo-play .choreo-wn[data-wn="1"] { opacity: 1; transform: none; transition-delay: 0.45s; }
 .narrative-scene.shown.choreo-play .choreo-wn[data-wn="2"] { opacity: 1; transform: none; transition-delay: 0.75s; }
+
+/* ============================================================
+   DECK 2 — scenes 4/5/6: rendered figure slides
+   The figures are pre-rendered PNGs so they cannot collide with
+   the site's global SVG rules. Swap back to inline SVG later.
+   ============================================================ */
+.slide-img-wrap {
+  flex: 1;
+  min-height: 0;              /* let the flex child actually shrink */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+}
+.slide-img {
+  display: block;
+  min-height: 0;              /* same: without this it refuses to shrink */
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+.slide-synthesis {
+  flex: 0 0 auto;
+  margin: 0;
+  max-width: 62ch;
+  text-align: center;
+  font-family: var(--serif);
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--text-soft);
+}
+.choreo-slide {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.55s cubic-bezier(.22, .61, .36, 1),
+    transform 0.55s cubic-bezier(.22, .61, .36, 1);
+}
+.narrative-scene.shown.choreo-play .choreo-slide[data-slide="0"] {
+  opacity: 1; transform: none; transition-delay: 0.10s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .choreo-slide { opacity: 1; transform: none; transition: none; }
+}
+
+/* The figure slides are dense; reclaim the scene padding and the eyebrow's
+   bottom margin so the image gets the maximum possible box. */
+.scene-deck2-4, .scene-deck2-5, .scene-deck2-6 {
+  padding: 20px 24px 22px;
+}
+.scene-deck2-4 .scene-eyebrow,
+.scene-deck2-5 .scene-eyebrow,
+.scene-deck2-6 .scene-eyebrow {
+  margin-bottom: 10px;
+}

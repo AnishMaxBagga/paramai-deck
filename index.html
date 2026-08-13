@@ -530,7 +530,16 @@
           <h1 class="scene-headline" data-deck-scene="3">
             What pharma gets <em>back.</em>
           </h1>
-          <h1 class="scene-headline scene-headline-empty" data-deck-scene="4" aria-hidden="true"></h1>
+          <h1 class="scene-headline" data-deck-scene="4">
+            The system <em>decides what to learn next.</em>
+          </h1>
+          <h1 class="scene-headline" data-deck-scene="5">
+            Two losses. One learns the prior, <em>the other keeps it honest.</em>
+          </h1>
+          <h1 class="scene-headline" data-deck-scene="6">
+            The half that works <em>produces what the other half needs.</em>
+          </h1>
+          <h1 class="scene-headline scene-headline-empty" data-deck-scene="7" aria-hidden="true"></h1>
         </div>
 
         <div class="narrative-stage">
@@ -725,8 +734,29 @@
               </div>
             </div>
 
-            <!-- DECK-2 SCENE 4: conclusion — wordmark, pitch, headshot, QR -->
+            <!-- SCENE 4: the architecture, the closed loop -->
             <div class="narrative-scene scene-deck2-4" data-deck-scene="4">
+              <div class="scene-eyebrow">The system</div>
+              <div class="slide-img-wrap">
+                <img class="slide-img choreo-slide" data-slide="0" src="assets/slides/architecture.png" alt="The full pipeline: a belief over named parameters drives an action, the action returns evidence, the belief updates." />
+                <p class="slide-synthesis">The loop stops when the decision is settled, not when the parameters are perfect.</p>
+              </div>
+            </div>
+            <div class="narrative-scene scene-deck2-5" data-deck-scene="5">
+              <div class="scene-eyebrow">The objective</div>
+              <div class="slide-img-wrap">
+                <img class="slide-img choreo-slide" data-slide="0" src="assets/slides/objective.png" alt="The training objective: total loss equals L1 plus lambda times L2." />
+              </div>
+            </div>
+            <div class="narrative-scene scene-deck2-6" data-deck-scene="6">
+              <div class="scene-eyebrow">What runs today</div>
+              <div class="slide-img-wrap">
+                <img class="slide-img choreo-slide" data-slide="0" src="assets/slides/buildorder.png" alt="Build order: curate published drug models into a corpus of real parameterized drugs, train L1 on it, and the resulting prior gives the loop a better starting belief." />
+                <p class="slide-synthesis">The prior is learned from real published pharmacology. The loop is the product, not the data source.</p>
+              </div>
+            </div>
+            <!-- DECK-2 SCENE 7: conclusion — wordmark, pitch, headshot, QR -->
+            <div class="narrative-scene scene-deck2-7" data-deck-scene="7">
               <div class="closer-viz">
                 <div class="closer-left">
                   <div class="closer-wordmark choreo-c" data-c="0">Param<span class="brand-accent">·</span>AI</div>
@@ -758,6 +788,9 @@
             <span class="scene-dot" data-deck-scene="2"></span>
             <span class="scene-dot" data-deck-scene="3"></span>
             <span class="scene-dot" data-deck-scene="4"></span>
+            <span class="scene-dot" data-deck-scene="5"></span>
+            <span class="scene-dot" data-deck-scene="6"></span>
+            <span class="scene-dot" data-deck-scene="7"></span>
           </div>
         </div>
 
