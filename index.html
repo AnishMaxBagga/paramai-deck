@@ -760,8 +760,68 @@
             </div>
             <div class="narrative-scene scene-deck2-7" data-deck-scene="7">
               <div class="scene-eyebrow">The demo</div>
-              <div class="slide-img-wrap">
-                <img class="slide-img choreo-slide" data-slide="0" src="assets/slides/demo.png" alt="The loop on gefitinib: 4,000 competing guesses narrow to a cluster, the rule for choosing which measurement to run, and the actual run going from 12 percent to 79 percent confidence with a final estimate of 0.253 against a true value of 0.255." />
+              <div class="bay">
+
+                <!-- input strip: what goes in -->
+                <div class="bay-input">
+                  <div class="bay-in-item">
+                    <span class="bay-in-k">Drug</span>
+                    <span class="bay-in-v">gefitinib, 250 mg once daily</span>
+                  </div>
+                  <div class="bay-in-item">
+                    <span class="bay-in-k">Model</span>
+                    <span class="bay-in-v">two compartment oral PK, 6 unknowns</span>
+                  </div>
+                  <div class="bay-in-item">
+                    <span class="bay-in-k">Question</span>
+                    <span class="bay-in-v">is the trough above 0.20 mg/L?</span>
+                  </div>
+                </div>
+
+                <div class="bay-body">
+
+                  <!-- LEFT: the belief, drawn as particles -->
+                  <div class="bay-left">
+                    <div class="bay-h">The belief <span class="bay-h-sub">4,000 guesses at clearance</span></div>
+                    <canvas class="bay-canvas" id="bay-canvas" width="760" height="300"></canvas>
+                    <div class="bay-axis">
+                      <span>4</span><span>16</span><span>28</span><span>40</span><span>52</span>
+                    </div>
+                    <div class="bay-axis-label">clearance, L/h &nbsp;&middot;&nbsp; the true value is 15.9</div>
+                  </div>
+
+                  <!-- RIGHT: readouts -->
+                  <div class="bay-right">
+                    <div class="bay-step-line">
+                      <span class="bay-step-n" id="bay-stepn">0 of 5</span>
+                      <span class="bay-step-label" id="bay-label">Prior belief, nothing read yet</span>
+                    </div>
+
+                    <div class="bay-metric">
+                      <div class="bay-m-k">Trough estimate</div>
+                      <div class="bay-m-v"><span id="bay-med">0.043</span> <em>mg/L</em></div>
+                      <div class="bay-m-range" id="bay-range">could be anywhere from 0.002 to 0.330</div>
+                    </div>
+
+                    <div class="bay-metric">
+                      <div class="bay-m-k">Confidence the dose works</div>
+                      <div class="bay-bar"><div class="bay-bar-fill" id="bay-fill"></div></div>
+                      <div class="bay-m-v bay-m-v-sm"><span id="bay-p">12</span><em>%</em></div>
+                    </div>
+
+                    <div class="bay-metric">
+                      <div class="bay-m-k">Uncertainty remaining</div>
+                      <div class="bay-m-v bay-m-v-sm"><span id="bay-h">6.73</span> <em>nats</em></div>
+                    </div>
+
+                    <button class="bay-btn" id="bay-replay" type="button">Run it again</button>
+                  </div>
+                </div>
+
+                <div class="bay-foot">
+                  Each dot is one complete guess at how the body handles this drug. Evidence
+                  kills off the guesses that predicted wrong. That is all Bayesian inference is.
+                </div>
               </div>
             </div>
             <!-- DECK-2 SCENE 8: conclusion — wordmark, pitch, headshot, QR -->

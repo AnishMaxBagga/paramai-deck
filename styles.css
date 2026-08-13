@@ -2925,3 +2925,100 @@ p:last-child { margin-bottom: 0; }
 .scene-deck2-7 .scene-eyebrow {
   margin-bottom: 10px;
 }
+
+/* ============================================================
+   Bayesian belief demo — deck 2, scene 7
+   ============================================================ */
+.bay {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.bay-input {
+  display: flex; flex-wrap: wrap; gap: 10px 28px;
+  padding-bottom: 12px; border-bottom: 1px solid var(--paper-line);
+  flex: 0 0 auto;
+}
+.bay-in-item { display: flex; align-items: baseline; gap: 8px; }
+.bay-in-k {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--text-muted);
+}
+.bay-in-v { font-size: 14px; color: var(--text); font-weight: 500; }
+
+.bay-body { flex: 1; min-height: 0; display: flex; gap: 28px; }
+
+.bay-left { flex: 1 1 62%; min-width: 0; display: flex; flex-direction: column; }
+.bay-h {
+  font-size: 13px; font-weight: 650; color: var(--text);
+  margin-bottom: 8px; flex: 0 0 auto;
+}
+.bay-h-sub { font-weight: 400; color: var(--text-muted); }
+.bay-canvas {
+  flex: 1; min-height: 0; width: 100%;
+  background: #fbfbfa; border: 1px solid var(--paper-line); border-radius: 8px;
+}
+.bay-axis {
+  display: flex; justify-content: space-between;
+  font-family: var(--mono); font-size: 10.5px; color: var(--text-muted);
+  padding: 5px 18px 0; flex: 0 0 auto;
+}
+.bay-axis-label {
+  text-align: center; font-size: 11px; color: var(--text-muted);
+  margin-top: 2px; flex: 0 0 auto;
+}
+
+.bay-right {
+  flex: 0 0 280px; display: flex; flex-direction: column; gap: 14px;
+  justify-content: flex-start;
+}
+.bay-step-line { display: flex; flex-direction: column; gap: 3px; }
+.bay-step-n {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em;
+  color: var(--rust); text-transform: uppercase;
+}
+.bay-step-label { font-size: 13.5px; color: var(--text); font-weight: 500; line-height: 1.3; }
+
+.bay-metric { display: flex; flex-direction: column; gap: 3px; }
+.bay-m-k {
+  font-family: var(--mono); font-size: 10px; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--text-muted);
+}
+.bay-m-v {
+  font-family: var(--serif); font-size: 26px; font-weight: 600;
+  color: var(--text); line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.bay-m-v-sm { font-size: 20px; }
+.bay-m-v em { font-size: 13px; font-style: normal; color: var(--text-muted); font-family: var(--sans); }
+.bay-m-range { font-size: 11.5px; color: var(--text-muted); }
+.bay-bar {
+  height: 9px; border-radius: 5px; background: var(--paper-2);
+  overflow: hidden; margin: 3px 0;
+}
+.bay-bar-fill {
+  height: 100%; width: 12%; border-radius: 5px; background: #0d7a5f;
+  transition: width .8s cubic-bezier(.22,.61,.36,1);
+}
+.bay-btn {
+  margin-top: auto; align-self: flex-start;
+  font-family: var(--sans); font-size: 12.5px; font-weight: 500;
+  color: var(--text); background: transparent;
+  border: 1.5px solid var(--paper-deep); border-radius: 7px;
+  padding: 7px 14px; cursor: pointer;
+  transition: background .2s, border-color .2s;
+}
+.bay-btn:hover { background: var(--paper-2); border-color: var(--text-muted); }
+.bay-btn:focus-visible { outline: 2px solid var(--rust); outline-offset: 2px; }
+
+.bay-foot {
+  flex: 0 0 auto; padding-top: 10px;
+  border-top: 1px solid var(--paper-line);
+  font-family: var(--serif); font-size: 13.5px; font-style: italic;
+  color: var(--text-soft); text-align: center;
+}
+
+@media (max-width: 900px) {
+  .bay-body { flex-direction: column; gap: 16px; }
+  .bay-right { flex: 0 0 auto; }
+  .bay-btn { margin-top: 4px; }
+}

@@ -661,3 +661,139 @@
     init();
   }
 })();
+
+/* ============================================================
+   Bayesian belief demo (deck 2, scene 7)
+   Shows what inference actually does: 4,000 guesses at clearance,
+   reweighted as each piece of evidence lands.
+
+   The step data is the real run from demo/results.json, not
+   invented for the animation. Particles are resampled from a
+   lognormal matching each step's reported [lo, median, hi] for
+   clearance, so the visual narrowing tracks the real posterior.
+   ============================================================ */
+(function () {
+  const STEPS = [
+    { label: "Prior belief, nothing read yet",              cl:[8.2,30.6,110.4], med:0.043, lo:0.002, hi:0.330, p:0.125, H:6.73 },
+    { label: "Ran the steady-state trough experiment",      cl:[6.6,13.3,24.0],  med:0.209, lo:0.140, hi:0.307, p:0.577, H:5.85 },
+    { label: "Read the terminal half-life",                 cl:[8.5,15.4,25.3],  med:0.210, lo:0.135, hi:0.324, p:0.587, H:5.00 },
+    { label: "Read Cmax from the PK summary",               cl:[8.2,15.1,25.4],  med:0.212, lo:0.131, hi:0.343, p:0.579, H:4.52 },
+    { label: "Read Tmax from the PK summary",               cl:[9.0,15.9,24.7],  med:0.207, lo:0.128, hi:0.332, p:0.546, H:3.60 },
+    { label: "Read the Phase I AUC table",                  cl:[8.1,14.4,23.1],  med:0.253, lo:0.150, hi:0.390, p:0.791, H:3.63 }
+  ];
+  const N = 900;              // drawn particles; the real filter carries 4,000
+  const XMIN = 4, XMAX = 52;  // clearance axis, L/h
+  const TRUTH = 15.9;
+
+  const cv = document.getElementById('bay-canvas');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  let W = cv.width, H = cv.height;
+
+  // Match the backing store to the CSS box so the dots stay crisp.
+  function resize() {
+    const r = cv.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    const dpr = window.devicePixelRatio || 1;
+    cv.width = Math.round(r.width * dpr);
+    cv.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    W = r.width; H = r.height;
+  }
+  window.addEventListener('resize', () => { resize(); paint(); });
+
+  const $ = id => document.getElementById(id);
+  const elN = $('bay-stepn'), elLabel = $('bay-label'), elMed = $('bay-med'),
+        elRange = $('bay-range'), elFill = $('bay-fill'), elP = $('bay-p'),
+        elH = $('bay-h'), elReplay = $('bay-replay');
+
+  const xpix = cl => ((Math.min(Math.max(cl, XMIN), XMAX) - XMIN) / (XMAX - XMIN)) * (W - 40) + 20;
+
+  // Draw from a lognormal whose 5th/95th percentiles match the step's reported
+  // interval, so the cloud is the posterior rather than decoration.
+  function sample(step) {
+    const [lo, med, hi] = step.cl;
+    const mu = Math.log(med);
+    const sigma = Math.max((Math.log(hi) - Math.log(lo)) / 3.29, 0.02);
+    const out = [];
+    for (let i = 0; i < N; i++) {
+      const u1 = Math.random() || 1e-9, u2 = Math.random();
+      const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+      out.push(Math.exp(mu + sigma * z));
+    }
+    return out;
+  }
+
+  let particles = sample(STEPS[0]).map(v => ({ x: v, tx: v, y: Math.random(), seed: Math.random() }));
+
+  function paint() {
+    ctx.clearRect(0, 0, W, H);
+
+    // truth marker
+    const tx = xpix(TRUTH);
+    ctx.strokeStyle = '#b94e2a'; ctx.lineWidth = 1.5; ctx.setLineDash([5, 4]);
+    ctx.beginPath(); ctx.moveTo(tx, 8); ctx.lineTo(tx, H - 8); ctx.stroke();
+    ctx.setLineDash([]);
+
+    for (const p of particles) {
+      const px = xpix(p.x);
+      const py = 18 + p.y * (H - 42);
+      ctx.beginPath();
+      ctx.arc(px, py, 2.1, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(107,95,214,0.42)';
+      ctx.fill();
+    }
+  }
+
+  let raf = null;
+  function animateTo(targets) {
+    particles.forEach((p, i) => { p.sx = p.x; p.tx = targets[i]; });
+    const t0 = performance.now(), DUR = 900;
+    if (raf) cancelAnimationFrame(raf);
+    (function frame(now) {
+      const t = Math.min((now - t0) / DUR, 1);
+      const e = 1 - Math.pow(1 - t, 3);
+      for (const p of particles) p.x = p.sx + (p.tx - p.sx) * e;
+      paint();
+      if (t < 1) raf = requestAnimationFrame(frame);
+    })(t0);
+  }
+
+  function render(i) {
+    const s = STEPS[i];
+    elN.textContent = i + ' of 5';
+    elLabel.textContent = s.label;
+    elMed.textContent = s.med.toFixed(3);
+    elRange.textContent = 'could be anywhere from ' + s.lo.toFixed(3) + ' to ' + s.hi.toFixed(3);
+    elP.textContent = Math.round(s.p * 100);
+    elFill.style.width = (s.p * 100).toFixed(0) + '%';
+    elH.textContent = s.H.toFixed(2);
+    animateTo(sample(s));
+  }
+
+  let timer = null, idx = 0;
+  function play() {
+    clearInterval(timer);
+    idx = 0; render(0);
+    timer = setInterval(() => {
+      idx++;
+      if (idx >= STEPS.length) { clearInterval(timer); return; }
+      render(idx);
+    }, 1700);
+  }
+
+  resize();
+  paint();
+  if (elReplay) elReplay.addEventListener('click', play);
+
+  // Autoplay once the slide is actually shown.
+  const scene = document.querySelector('.scene-deck2-7');
+  if (scene) {
+    let played = false;
+    new MutationObserver(() => {
+      const on = scene.classList.contains('shown');
+      if (on && !played) { played = true; resize(); setTimeout(play, 350); }
+      if (!on) { played = false; clearInterval(timer); }
+    }).observe(scene, { attributes: true, attributeFilter: ['class'] });
+  }
+})();
